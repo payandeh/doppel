@@ -1,15 +1,12 @@
-## What does this change?
+<!-- Title format: type(scope): description, e.g. "fix(content): keep readyState at 4 after abort" -->
 
-<!-- A short description, and the issue it fixes if there is one (e.g. Fixes #12). -->
+## What does this change?
 
 ## How did you test it?
 
-<!-- e.g. npm test, npm run test:e2e, manual steps in Chrome -->
-
 ## Checklist
 
-- [ ] `npm test` passes
+- [ ] Branch and commits follow the conventions in CONTRIBUTING.md
 - [ ] Tests added or updated for behavior changes
-- [ ] `CHANGELOG.md` updated under **Unreleased**
 - [ ] Screenshots for UI changes (light and dark mode)
-- [ ] Ran `python3 tools/ignore-list.py` if `content/inject.js` changed
+- [ ] Linked issue, if there is one (e.g. `Fixes #12`)

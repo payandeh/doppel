@@ -11,6 +11,8 @@ Override the status code and JSON body of any REST call, straight from Chrome's 
   <a href="https://github.com/payandeh/doppel/actions/workflows/ci.yml"><img src="https://github.com/payandeh/doppel/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/payandeh/doppel/releases/latest"><img src="https://img.shields.io/github/v/release/payandeh/doppel?color=FF6B5B" alt="Latest release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/payandeh/doppel?color=14B8A6" alt="MIT license"></a>
+  <a href="https://scorecard.dev/viewer/?uri=github.com/payandeh/doppel"><img src="https://api.scorecard.dev/projects/github.com/payandeh/doppel/badge" alt="OpenSSF Scorecard"></a>
+  <a href="https://www.conventionalcommits.org"><img src="https://img.shields.io/badge/Conventional%20Commits-1.0.0-FF6B5B" alt="Conventional Commits"></a>
   <img src="https://img.shields.io/badge/Chrome-Manifest%20V3-0F1B24?logo=googlechrome&logoColor=white" alt="Chrome Manifest V3">
 </p>
 
@@ -97,17 +99,18 @@ fetches the real response (unless **Mock only** is on) and hands the page the ov
 
 ## Development
 
-No build step. Edit the files and reload the extension in `chrome://extensions`.
+No build step: edit the files and reload the extension in `chrome://extensions`.
 
 ```bash
-npm install
-npm test                          # static checks + unit tests
-npx playwright install chromium   # once
-npm run test:e2e                  # loads the extension in Chromium and tests real pages
-npm run build                     # dist/doppel-<version>.zip
+npm install                        # dependencies and git hooks
+npm test                           # static checks + unit tests
+npx playwright install chromium    # once
+npm run test:e2e                   # loads the extension in Chromium and tests real pages
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
+Changes go through pull requests with [Conventional Commits](https://www.conventionalcommits.org/) and branch names like
+`feat/har-import`. Git hooks and CI enforce both, and CodeRabbit reviews every pull request. See
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ```
 manifest.json        extension manifest (MV3)
@@ -118,11 +121,9 @@ content/bridge.js    rule matching (isolated world)
 content/DOPPEL.js    marks overridden requests in the Initiator column
 lib/                 shared UI, matcher, JSON validator, folder sync
 lib/vendor/          bundled CodeMirror 6 JSON editor (MIT)
-tests/unit/          node:test unit tests
-tests/e2e/           Playwright tests with the real extension loaded
+tests/               unit (node:test) and end-to-end (Playwright) tests
+tools/               checks, packaging, branch-name and source-map helpers
 ```
-
-After editing `content/inject.js`, run `python3 tools/ignore-list.py` (keeps it out of DevTools stack traces; `npm test` reminds you).
 
 ## Brand
 
