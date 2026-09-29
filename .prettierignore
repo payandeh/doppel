@@ -1,0 +1,7 @@
+node_modules/
+dist/
+lib/vendor/
+package-lock.json
+CHANGELOG.md
+*.png
+*.svg

@@ -11,12 +11,12 @@ async function handleHash() {
     const rule = rules.find((r) => r.id === id);
     if (rule) openRuleEditor({ rule });
   }
-  if (h === '#folder') setTimeout(() => document.getElementById('folder-box').scrollIntoView({ behavior: 'smooth' }), 100);
+  if (h === '#folder')
+    setTimeout(() => document.getElementById('folder-box').scrollIntoView({ behavior: 'smooth' }), 100);
   if (h) history.replaceState(null, '', location.pathname);
 }
 handleHash();
 
-// Settings
 (async () => {
   const el = document.getElementById('set-panel');
   const { apiov_settings: st = {} } = await chrome.storage.local.get('apiov_settings');
@@ -28,14 +28,15 @@ handleHash();
   });
 })();
 
-// ---------- Folder on disk ----------
 (() => {
   const $ = (id) => document.getElementById(id);
   const when = (t) => (t ? new Date(t).toLocaleString() : '');
   const plural = (n) => `${n} override${n === 1 ? '' : 's'}`;
 
   function show(status) {
-    const title = $('folder-title'), sub = $('folder-sub'), banner = $('folder-banner');
+    const title = $('folder-title'),
+      sub = $('folder-sub'),
+      banner = $('folder-banner');
     const has = status.state !== 'none';
     $('folder-choose').textContent = has ? 'Change folder…' : 'Choose folder…';
     $('folder-reconnect').hidden = status.state !== 'needs-permission';
@@ -53,7 +54,8 @@ handleHash();
       sub.textContent = `✓ Saved to ${FolderSync.FILE}${status.lastSyncAt ? ' — last synced ' + when(status.lastSyncAt) : ''}`;
       sub.classList.add('ok');
     } else if (status.state === 'needs-permission') {
-      sub.textContent = 'Chrome needs your permission again to use this folder (it asks after a browser restart). Changes are kept in the browser until then.';
+      sub.textContent =
+        'Chrome needs your permission again to use this folder (it asks after a browser restart). Changes are kept in the browser until then.';
       sub.classList.add('warn');
       banner.hidden = false;
       banner.innerHTML = `<span>⚠ Folder <b></b> isn't connected — new changes aren't being saved to disk.</span><span class="spacer"></span><button class="btn primary sm" id="banner-allow">Allow access</button>`;
@@ -72,14 +74,20 @@ handleHash();
     const msg = first
       ? `This folder already has ${plural(file.rules.length)} (saved ${when(file.savedAt)}).\nThis browser has ${plural(local.rules.length)}.\n\nWhat do you want to do?`
       : `The file in the folder was changed outside the extension (${plural(file.rules.length)}), and you also changed overrides here (${plural(local.rules.length)}).\n\nWhich version do you want to keep?`;
-    const choice = await APIOV.choiceDialog(msg, [
-      { value: 'browser', label: first ? 'Replace folder with browser' : 'Keep browser version' },
-      { value: 'merge', label: 'Merge both' },
-      { value: 'folder', label: first ? 'Load from folder' : 'Use folder version', kind: 'primary' }
-    ], { title: first ? 'Overrides found in this folder' : 'Sync conflict' });
+    const choice = await APIOV.choiceDialog(
+      msg,
+      [
+        { value: 'browser', label: first ? 'Replace folder with browser' : 'Keep browser version' },
+        { value: 'merge', label: 'Merge both' },
+        { value: 'folder', label: first ? 'Load from folder' : 'Use folder version', kind: 'primary' }
+      ],
+      { title: first ? 'Overrides found in this folder' : 'Sync conflict' }
+    );
     if (!choice) return false;
     await FolderSync.resolve(choice);
-    APIOV.toast(choice === 'folder' ? 'Loaded overrides from folder' : choice === 'merge' ? 'Merged and saved' : 'Saved to folder');
+    APIOV.toast(
+      choice === 'folder' ? 'Loaded overrides from folder' : choice === 'merge' ? 'Merged and saved' : 'Saved to folder'
+    );
     return true;
   }
 
@@ -112,15 +120,25 @@ handleHash();
     refresh();
   });
   $('folder-reconnect').addEventListener('click', reconnect);
-  $('folder-sync').addEventListener('click', async () => { const s = await refresh(); if (s && s.state === 'ok') APIOV.toast('Synced'); });
+  $('folder-sync').addEventListener('click', async () => {
+    const s = await refresh();
+    if (s && s.state === 'ok') APIOV.toast('Synced');
+  });
   $('folder-disconnect').addEventListener('click', async () => {
-    if (!(await APIOV.confirmDialog('Stop saving overrides to this folder? Your overrides stay in the browser and the file stays in the folder.', { okText: 'Stop using folder' }))) return;
+    if (
+      !(await APIOV.confirmDialog(
+        'Stop saving overrides to this folder? Your overrides stay in the browser and the file stays in the folder.',
+        { okText: 'Stop using folder' }
+      ))
+    )
+      return;
     await FolderSync.disconnect();
     refresh();
   });
 
   FolderSync.watch(show);
   refresh();
-  // Pick up edits made to the file outside Chrome (e.g. git pull) when you come back to this tab.
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refresh();
+  });
 })();

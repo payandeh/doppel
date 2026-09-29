@@ -1,6 +1,6 @@
 name: Bug report
 description: Something isn't working as expected
-labels: ["bug"]
+labels: ['bug']
 body:
   - type: markdown
     attributes:
@@ -30,21 +30,21 @@ body:
     id: chrome
     attributes:
       label: Chrome version
-      placeholder: "e.g. 146.0.7680.80 (from chrome://version)"
+      placeholder: 'e.g. 146.0.7680.80 (from chrome://version)'
     validations:
       required: true
   - type: input
     id: doppel
     attributes:
       label: Doppel version
-      placeholder: "e.g. 1.3.0 (from chrome://extensions)"
+      placeholder: 'e.g. 1.3.0 (from chrome://extensions)'
     validations:
       required: true
   - type: dropdown
     id: kind
     attributes:
       label: Request type
-      options: ["fetch", "XMLHttpRequest (axios, jQuery, …)", "Not sure"]
+      options: ['fetch', 'XMLHttpRequest (axios, jQuery, …)', 'Not sure']
   - type: textarea
     id: console
     attributes:

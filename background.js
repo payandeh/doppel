@@ -1,6 +1,5 @@
 importScripts('lib/folder-sync.js');
 
-// Keeps the toolbar badge showing how many overrides are active.
 async function updateBadge() {
   const d = await chrome.storage.local.get(['apiov_rules', 'apiov_enabled']);
   const on = d.apiov_enabled !== false;
@@ -16,8 +15,6 @@ chrome.storage.onChanged.addListener((c, area) => {
   if (area === 'local' && (c.apiov_rules || c.apiov_enabled)) updateBadge();
 });
 
-// Opens (or reuses) the small editor window used by
-// Network tab → right-click → "Open using Doppel".
 async function openEditorWindow() {
   const url = chrome.runtime.getURL('editor.html') + '#draft=' + Date.now();
   const { editorWindowId } = await chrome.storage.session.get('editorWindowId');
@@ -30,7 +27,7 @@ async function openEditorWindow() {
         await chrome.windows.update(win.id, { focused: true });
         return;
       }
-    } catch (_) { /* window was closed */ }
+    } catch (_) {}
   }
   const win = await chrome.windows.create({ url, type: 'popup', width: 920, height: 780, focused: true });
   await chrome.storage.session.set({ editorWindowId: win.id });
@@ -46,7 +43,9 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
     });
   }
   if (msg.type === 'apiov:devtools-status') {
-    chrome.storage.session.get('devtoolsTabs').then(({ devtoolsTabs = {} }) => reply({ at: devtoolsTabs[msg.tabId] || 0 }));
+    chrome.storage.session
+      .get('devtoolsTabs')
+      .then(({ devtoolsTabs = {} }) => reply({ at: devtoolsTabs[msg.tabId] || 0 }));
     return true;
   }
 });
@@ -55,6 +54,5 @@ chrome.windows.onRemoved.addListener(async (id) => {
   if (id === editorWindowId) chrome.storage.session.remove('editorWindowId');
 });
 
-// Save every change to the user's folder (if one is connected and permission is granted).
 FolderSync.watch();
 chrome.runtime.onStartup.addListener(() => FolderSync.sync().catch(() => {}));

@@ -38,14 +38,43 @@ test('reports helpful messages with line and column', () => {
 });
 
 test('agrees with JSON.parse on random input', () => {
-  const atoms = ['{', '}', '[', ']', ',', ':', '"a"', '"b\\n"', '1', '-2.5e3', '0', '01', 'true', 'null', 'nul', ' ', '\n', '"', "'", '.', 'e'];
+  const atoms = [
+    '{',
+    '}',
+    '[',
+    ']',
+    ',',
+    ':',
+    '"a"',
+    '"b\\n"',
+    '1',
+    '-2.5e3',
+    '0',
+    '01',
+    'true',
+    'null',
+    'nul',
+    ' ',
+    '\n',
+    '"',
+    "'",
+    '.',
+    'e'
+  ];
   let seed = 42;
-  const rand = (n) => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed % n; };
+  const rand = (n) => {
+    seed = (seed * 1103515245 + 12345) % 2147483648;
+    return seed % n;
+  };
   for (let k = 0; k < 20000; k++) {
     let s = '';
     for (let j = 0, L = 1 + rand(12); j < L; j++) s += atoms[rand(atoms.length)];
     let native = true;
-    try { JSON.parse(s); } catch { native = false; }
+    try {
+      JSON.parse(s);
+    } catch {
+      native = false;
+    }
     const r = JsonCheck.validate(s);
     if (r.empty) continue;
     assert.equal(r.ok, native, JSON.stringify(s));

@@ -1,24 +1,51 @@
 <!doctype html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Override API</title>
-  <link rel="stylesheet" href="lib/styles.css">
-  <style>
-    html, body { height: 100%; }
-    body { font-size: 13px; }
-    .modal-back.standalone { background: var(--bg); padding: 0; }
-    .modal-back.standalone .modal { width: 100%; height: 100%; max-height: none; border: 0; border-radius: 0; box-shadow: none; }
-    .modal-back.standalone .json-host { flex: 1; height: auto; min-height: 200px; resize: none; }
-    .draft-note { margin: 0; padding: 6px 10px; border-radius: 6px; background: var(--accent-soft); color: var(--fg); font-size: 12px; }
-  </style>
-</head>
-<body>
-  <script src="lib/match.js"></script>
-  <script src="lib/json-check.js"></script>
-  <script src="lib/vendor/json-editor.js"></script>
-  <script src="lib/core.js"></script>
-  <script src="lib/editor.js"></script>
-  <script src="editor.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <title>Override API</title>
+    <link rel="stylesheet" href="lib/styles.css" />
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-size: 13px;
+      }
+      .modal-back.standalone {
+        background: var(--bg);
+        padding: 0;
+      }
+      .modal-back.standalone .modal {
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .modal-back.standalone .json-host {
+        flex: 1;
+        height: auto;
+        min-height: 200px;
+        resize: none;
+      }
+      .draft-note {
+        margin: 0;
+        padding: 6px 10px;
+        border-radius: 6px;
+        background: var(--accent-soft);
+        color: var(--fg);
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="lib/match.js"></script>
+    <script src="lib/json-check.js"></script>
+    <script src="lib/vendor/json-editor.js"></script>
+    <script src="lib/core.js"></script>
+    <script src="lib/editor.js"></script>
+    <script src="editor.js"></script>
+  </body>
 </html>

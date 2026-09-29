@@ -11,7 +11,7 @@ Thanks for helping make Doppel better! Bug reports, ideas and pull requests are 
 
 ## Development setup
 
-Doppel has no build step: the repo folder *is* the extension.
+Doppel has no build step: the repo folder _is_ the extension.
 
 1. `git clone https://github.com/payandeh/doppel.git`
 2. Open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and pick the repo folder.

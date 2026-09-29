@@ -54,14 +54,14 @@ Manage everything from the toolbar popup or the manager page (right-click the to
 
 ### Override options
 
-| Option | What it does |
-| --- | --- |
-| Method | `ANY`, or a specific HTTP method |
-| URL match | **Equals** (optionally ignoring the query string), **Contains**, **Wildcard** (`*`) or **Regex** |
-| Status code | 200–599. Empty = keep the server's status |
-| Response body | JSON. Empty = keep the server's body |
-| Delay | Wait before responding (ms) |
-| Mock only | Don't call the server at all |
+| Option        | What it does                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------ |
+| Method        | `ANY`, or a specific HTTP method                                                                 |
+| URL match     | **Equals** (optionally ignoring the query string), **Contains**, **Wildcard** (`*`) or **Regex** |
+| Status code   | 200–599. Empty = keep the server's status                                                        |
+| Response body | JSON. Empty = keep the server's body                                                             |
+| Delay         | Wait before responding (ms)                                                                      |
+| Mock only     | Don't call the server at all                                                                     |
 
 When several overrides match the same request, the one higher in the list wins.
 
@@ -126,12 +126,12 @@ After editing `content/inject.js`, run `python3 tools/ignore-list.py` (keeps it 
 
 ## Brand
 
-| | | |
-| --- | --- | --- |
+|                                                                 |       |           |
+| --------------------------------------------------------------- | ----- | --------- |
 | ![](https://img.shields.io/badge/-%20-FF6B5B?style=flat-square) | Coral | `#FF6B5B` |
-| ![](https://img.shields.io/badge/-%20-14B8A6?style=flat-square) | Teal | `#14B8A6` |
-| ![](https://img.shields.io/badge/-%20-0F1B24?style=flat-square) | Ink | `#0F1B24` |
-| ![](https://img.shields.io/badge/-%20-EEF9F7?style=flat-square) | Foam | `#EEF9F7` |
+| ![](https://img.shields.io/badge/-%20-14B8A6?style=flat-square) | Teal  | `#14B8A6` |
+| ![](https://img.shields.io/badge/-%20-0F1B24?style=flat-square) | Ink   | `#0F1B24` |
+| ![](https://img.shields.io/badge/-%20-EEF9F7?style=flat-square) | Foam  | `#EEF9F7` |
 
 The logo is two overlapping circles: the real response and its double, with the overlap where they look the same.
 

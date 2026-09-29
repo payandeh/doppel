@@ -19,11 +19,19 @@ test('contains, wildcard and regex', () => {
   const w = rule({ matchType: 'wildcard', pattern: '*/api/items*' });
   assert.equal(matches(w, 'https://x.io/api/items?x=1', 'GET'), true);
   assert.equal(matches(w, 'https://x.io/api/other', 'GET'), false);
-  assert.equal(matches(rule({ matchType: 'wildcard', pattern: 'https://x.io/a.b' }), 'https://x.io/aXb', 'GET'), false, 'dots are literal');
+  assert.equal(
+    matches(rule({ matchType: 'wildcard', pattern: 'https://x.io/a.b' }), 'https://x.io/aXb', 'GET'),
+    false,
+    'dots are literal'
+  );
   const re = rule({ matchType: 'regex', pattern: '^https://shop\\.io/orders/\\d+$' });
   assert.equal(matches(re, 'https://shop.io/orders/42', 'GET'), true);
   assert.equal(matches(re, 'https://shop.io/orders/abc', 'GET'), false);
-  assert.equal(matches(rule({ matchType: 'regex', pattern: '(' }), 'https://x.io', 'GET'), false, 'invalid regex never matches');
+  assert.equal(
+    matches(rule({ matchType: 'regex', pattern: '(' }), 'https://x.io', 'GET'),
+    false,
+    'invalid regex never matches'
+  );
 });
 
 test('method filter', () => {

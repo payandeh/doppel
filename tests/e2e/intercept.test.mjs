@@ -19,44 +19,71 @@ before(async () => {
   page = await ext.ctx.newPage();
   await page.goto(api.base + '/');
 });
-after(async () => { await ext.ctx.close(); api.srv.close(); });
+after(async () => {
+  await ext.ctx.close();
+  api.srv.close();
+});
 
-const xhr = (url, opts = {}) => page.evaluate(([url, opts]) => new Promise((resolve) => {
-  const x = new XMLHttpRequest();
-  x.open(opts.method || 'GET', url);
-  if (opts.responseType) x.responseType = opts.responseType;
-  if (opts.timeout) x.timeout = opts.timeout;
-  const states = [];
-  x.onreadystatechange = () => states.push(x.readyState);
-  x.onload = () => resolve({ ev: 'load', status: x.status, body: opts.responseType ? x.response : x.responseText, type: x.getResponseHeader('content-type'), states: states.join('') });
-  x.onerror = () => resolve({ ev: 'error' });
-  x.ontimeout = () => resolve({ ev: 'timeout', status: x.status });
-  x.onabort = () => resolve({ ev: 'abort', readyState: x.readyState });
-  x.send(opts.body ?? null);
-  if (opts.abortAfter) setTimeout(() => x.abort(), opts.abortAfter);
-}), [url, opts]);
+const xhr = (url, opts = {}) =>
+  page.evaluate(
+    ([url, opts]) =>
+      new Promise((resolve) => {
+        const x = new XMLHttpRequest();
+        x.open(opts.method || 'GET', url);
+        if (opts.responseType) x.responseType = opts.responseType;
+        if (opts.timeout) x.timeout = opts.timeout;
+        const states = [];
+        x.onreadystatechange = () => states.push(x.readyState);
+        x.onload = () =>
+          resolve({
+            ev: 'load',
+            status: x.status,
+            body: opts.responseType ? x.response : x.responseText,
+            type: x.getResponseHeader('content-type'),
+            states: states.join('')
+          });
+        x.onerror = () => resolve({ ev: 'error' });
+        x.ontimeout = () => resolve({ ev: 'timeout', status: x.status });
+        x.onabort = () => resolve({ ev: 'abort', readyState: x.readyState });
+        x.send(opts.body ?? null);
+        if (opts.abortAfter) setTimeout(() => x.abort(), opts.abortAfter);
+      }),
+    [url, opts]
+  );
 
 test('overrides requests made while the page is loading', async () => {
   assert.equal(await page.evaluate(() => window.early), 500);
 });
 
 test('fetch: status only keeps the real body', async () => {
-  const r = await page.evaluate(async () => { const x = await fetch('/api/status'); return [x.status, x.statusText, await x.json()]; });
+  const r = await page.evaluate(async () => {
+    const x = await fetch('/api/status');
+    return [x.status, x.statusText, await x.json()];
+  });
   assert.deepEqual(r, [503, 'Service Unavailable', { real: true, path: '/api/status', method: 'GET' }]);
 });
 
 test('fetch: body only keeps the real status', async () => {
-  const r = await page.evaluate(async () => { const x = await fetch('/api/body'); return [x.status, await x.json(), x.headers.get('content-type')]; });
+  const r = await page.evaluate(async () => {
+    const x = await fetch('/api/body');
+    return [x.status, await x.json(), x.headers.get('content-type')];
+  });
   assert.deepEqual(r, [200, { mock: true }, 'application/json; charset=utf-8']);
 });
 
 test('fetch: status and body', async () => {
-  const r = await page.evaluate(async () => { const x = await fetch('/api/both'); return [x.status, await x.json()]; });
+  const r = await page.evaluate(async () => {
+    const x = await fetch('/api/both');
+    return [x.status, await x.json()];
+  });
   assert.deepEqual(r, [404, { error: 'nope' }]);
 });
 
 test('fetch: mock only works for a Request object and never hits the server', async () => {
-  const r = await page.evaluate(async () => { const x = await fetch(new Request('/api/mock-only', { method: 'POST', body: 'x' })); return [x.status, await x.json()]; });
+  const r = await page.evaluate(async () => {
+    const x = await fetch(new Request('/api/mock-only', { method: 'POST', body: 'x' }));
+    return [x.status, await x.json()];
+  });
   assert.deepEqual(r, [201, { created: 1 }]);
 });
 
@@ -87,7 +114,10 @@ test('XHR: timeout and abort on delayed overrides', async () => {
 });
 
 test('requests without an override are untouched', async () => {
-  const r = await page.evaluate(async () => { const x = await fetch('/api/other'); return [x.status, (await x.json()).real]; });
+  const r = await page.evaluate(async () => {
+    const x = await fetch('/api/other');
+    return [x.status, (await x.json()).real];
+  });
   assert.deepEqual(r, [200, true]);
   const x = await xhr('/api/other');
   assert.equal(x.status, 200);
@@ -96,7 +126,8 @@ test('requests without an override are untouched', async () => {
 test('a page cannot read overrides meant for other URLs', async () => {
   const seen = await page.evaluate(async () => {
     const out = [];
-    for (const t of ['apiov:rules', 'apiov:state', 'apiov:match-result']) document.addEventListener(t, (e) => out.push(String(e.detail)));
+    for (const t of ['apiov:rules', 'apiov:state', 'apiov:match-result'])
+      document.addEventListener(t, (e) => out.push(String(e.detail)));
     document.dispatchEvent(new CustomEvent('apiov:request-state'));
     document.dispatchEvent(new CustomEvent('apiov:request-rules'));
     await fetch('/api/body');

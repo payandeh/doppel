@@ -3,10 +3,7 @@
   "name": "Doppel",
   "version": "1.3.0",
   "description": "A body double for your API responses \u2014 override the status code and JSON body of REST calls, many at once.",
-  "permissions": [
-    "storage",
-    "unlimitedStorage"
-  ],
+  "permissions": ["storage", "unlimitedStorage"],
   "background": {
     "service_worker": "background.js"
   },
@@ -29,24 +26,14 @@
   "options_page": "manager.html",
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "lib/match.js",
-        "content/bridge.js"
-      ],
+      "matches": ["<all_urls>"],
+      "js": ["lib/match.js", "content/bridge.js"],
       "run_at": "document_start",
       "all_frames": true
     },
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "content/DOPPEL.js",
-        "content/inject.js"
-      ],
+      "matches": ["<all_urls>"],
+      "js": ["content/DOPPEL.js", "content/inject.js"],
       "run_at": "document_start",
       "all_frames": true,
       "world": "MAIN"

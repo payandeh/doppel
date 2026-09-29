@@ -1,36 +1,69 @@
 <!doctype html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Doppel</title>
-  <link rel="stylesheet" href="lib/styles.css">
-  <style>
-    body { width: 560px; min-height: 180px; max-height: 580px; }
-    .top { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--border); }
-    .top h1 { font-size: 14px; margin: 0; flex: 1; display: flex; align-items: center; gap: 6px; }
-    .top img { width: 18px; height: 18px; }
-    .rules-toolbar .search { width: 150px; }
-    .dt-status { margin-top: 4px; }
-    .dt-status.ok { color: var(--ok); }
-    .dt-status.warn { color: var(--warn); }
-    .foot { padding: 8px 12px; color: var(--muted); font-size: 11px; border-top: 1px solid var(--border); }
-  </style>
-</head>
-<body>
-  <div class="top">
-    <h1><img src="icons/icon32.png" alt=""> Doppel</h1>
-    <button class="btn" id="manage">Open manager ↗</button>
-  </div>
-  <div id="rules"></div>
-  <div class="foot">
-    <div>Tip: DevTools → <b>Network</b> → right-click a request → <b>Open using Doppel</b>.</div>
-    <div id="dt-status" class="dt-status"></div>
-    <div id="folder-status" class="dt-status"></div>
-  </div>
-  <script src="lib/match.js"></script>
-  <script src="lib/core.js"></script>
-  <script src="lib/rules-view.js"></script>
-  <script src="lib/folder-sync.js"></script>
-  <script src="popup.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <title>Doppel</title>
+    <link rel="stylesheet" href="lib/styles.css" />
+    <style>
+      body {
+        width: 560px;
+        min-height: 180px;
+        max-height: 580px;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      .top h1 {
+        font-size: 14px;
+        margin: 0;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .top img {
+        width: 18px;
+        height: 18px;
+      }
+      .rules-toolbar .search {
+        width: 150px;
+      }
+      .dt-status {
+        margin-top: 4px;
+      }
+      .dt-status.ok {
+        color: var(--ok);
+      }
+      .dt-status.warn {
+        color: var(--warn);
+      }
+      .foot {
+        padding: 8px 12px;
+        color: var(--muted);
+        font-size: 11px;
+        border-top: 1px solid var(--border);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top">
+      <h1><img src="icons/icon32.png" alt="" /> Doppel</h1>
+      <button class="btn" id="manage">Open manager ↗</button>
+    </div>
+    <div id="rules"></div>
+    <div class="foot">
+      <div>Tip: DevTools → <b>Network</b> → right-click a request → <b>Open using Doppel</b>.</div>
+      <div id="dt-status" class="dt-status"></div>
+      <div id="folder-status" class="dt-status"></div>
+    </div>
+    <script src="lib/match.js"></script>
+    <script src="lib/core.js"></script>
+    <script src="lib/rules-view.js"></script>
+    <script src="lib/folder-sync.js"></script>
+    <script src="popup.js"></script>
+  </body>
 </html>

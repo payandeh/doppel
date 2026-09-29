@@ -5,17 +5,37 @@
   "description": "A body double for your API responses — Chrome extension to override REST API status codes and JSON bodies.",
   "license": "MIT",
   "author": "Omid (https://github.com/payandeh)",
-  "repository": { "type": "git", "url": "git+https://github.com/payandeh/doppel.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/payandeh/doppel.git"
+  },
   "homepage": "https://github.com/payandeh/doppel#readme",
   "bugs": "https://github.com/payandeh/doppel/issues",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "check": "node tools/check.mjs",
     "test": "npm run check && node --test 'tests/unit/*.test.mjs'",
     "test:e2e": "node --test --test-concurrency=1 'tests/e2e/*.test.mjs'",
-    "build": "bash tools/package.sh"
+    "build": "bash tools/package.sh",
+    "ignore-list": "node tools/ignore-list.mjs",
+    "prepare": "husky",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
-    "playwright": "^1.56.0"
-  }
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.11.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.12.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "playwright": "^1.56.0",
+    "prettier": "^3.9.9"
+  },
+  "type": "module"
 }

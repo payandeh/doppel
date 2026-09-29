@@ -1,5 +1,3 @@
-// Standalone editor window opened from
-// DevTools → Network → right-click a request → "Open using Doppel".
 (async () => {
   const { apiov_draft: draft } = await chrome.storage.local.get('apiov_draft');
   const { rules } = await APIOV.load();
@@ -10,7 +8,6 @@
     return;
   }
 
-  // Already overriding this request? Edit that override instead of creating a duplicate.
   const existing = APIOV.findRule(rules, draft.url, draft.method, true);
   let note;
   if (existing) {
@@ -19,8 +16,10 @@
     return;
   }
 
-  if (!draft.found) note = 'Response not found in the Network log (it may have been cleared) — enter the body manually.';
-  else if (draft.body && !JsonCheck.validate(draft.body).ok) note = 'The current response is not valid JSON — fix it or clear it to keep the original body.';
+  if (!draft.found)
+    note = 'Response not found in the Network log (it may have been cleared) — enter the body manually.';
+  else if (draft.body && !JsonCheck.validate(draft.body).ok)
+    note = 'The current response is not valid JSON — fix it or clear it to keep the original body.';
   const pretty = draft.body ? JsonCheck.format(draft.body) : null;
   openRuleEditor({
     isNew: true,
@@ -33,7 +32,7 @@
       matchType: 'equals',
       pattern: draft.url,
       status: null,
-      body: pretty && pretty.ok ? pretty.text : (draft.body || '')
+      body: pretty && pretty.ok ? pretty.text : draft.body || ''
     })
   });
 })();
