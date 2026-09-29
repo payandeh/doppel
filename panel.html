@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="lib/styles.css">
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <nav class="tabs">
+    <button class="tab active" data-tab="net">Network</button>
+    <button class="tab" data-tab="ovr">Overrides <span class="count" id="ovr-count"></span></button>
+    <div class="spacer"></div>
+    <span class="global-off" id="global-off" hidden>All overrides are turned off</span>
+  </nav>
+
+  <section id="net" class="view">
+    <div class="net-toolbar">
+      <input id="filter" type="search" placeholder="Filter URL…">
+      <label class="check"><input type="checkbox" id="xhrOnly" checked> Fetch/XHR only</label>
+      <label class="check"><input type="checkbox" id="preserve"> Preserve log</label>
+      <button class="btn sm" id="clear" title="Clear list">Clear</button>
+      <div class="spacer"></div>
+      <span class="muted">Right-click a request → <b>Override API</b></span>
+    </div>
+    <div class="split">
+      <div class="table-wrap">
+        <table class="net">
+          <thead><tr><th class="c-name">Name</th><th class="c-method">Method</th><th class="c-status">Status</th><th class="c-type">Type</th><th class="c-size">Size</th><th class="c-time">Time</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="net-empty" id="net-empty">Recording network activity…<br>Reload the page or trigger requests to see them here.</div>
+      </div>
+      <aside class="preview" id="preview" hidden>
+        <div class="pv-head">
+          <div class="pv-title mono" id="pv-title"></div>
+          <button class="icon-btn" id="pv-close" title="Close">✕</button>
+        </div>
+        <div class="pv-actions">
+          <button class="btn primary sm" id="pv-override">Override API</button>
+          <button class="btn sm" id="pv-copy">Copy response</button>
+          <span class="muted" id="pv-note"></span>
+        </div>
+        <div class="pv-body" id="pv-body"></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="ovr" class="view" hidden>
+    <div id="rules"></div>
+  </section>
+
+  <div class="ctx" id="ctx" hidden></div>
+
+  <script src="lib/match.js"></script>
+  <script src="lib/json-check.js"></script>
+  <script src="lib/vendor/json-editor.js"></script>
+  <script src="lib/core.js"></script>
+  <script src="lib/editor.js"></script>
+  <script src="lib/rules-view.js"></script>
+  <script src="panel.js"></script>
+</body>
+</html>

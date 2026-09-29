@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <title>Doppel</title>
+  <defs><clipPath id="doppel-overlap"><circle cx="50" cy="64" r="30"/></clipPath></defs>
+  <rect width="128" height="128" rx="28" fill="#0F1B24"/>
+  <circle cx="50" cy="64" r="30" fill="#14B8A6"/>
+  <circle cx="78" cy="64" r="30" fill="#FF6B5B"/>
+  <circle cx="78" cy="64" r="30" fill="#FFFFFF" clip-path="url(#doppel-overlap)"/>
+</svg>
