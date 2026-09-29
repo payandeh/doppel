@@ -1,0 +1,21 @@
+{
+  "name": "doppel",
+  "version": "1.3.0",
+  "private": true,
+  "description": "A body double for your API responses — Chrome extension to override REST API status codes and JSON bodies.",
+  "license": "MIT",
+  "author": "Omid (https://github.com/payandeh)",
+  "repository": { "type": "git", "url": "git+https://github.com/payandeh/doppel.git" },
+  "homepage": "https://github.com/payandeh/doppel#readme",
+  "bugs": "https://github.com/payandeh/doppel/issues",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "check": "node tools/check.mjs",
+    "test": "npm run check && node --test 'tests/unit/*.test.mjs'",
+    "test:e2e": "node --test --test-concurrency=1 'tests/e2e/*.test.mjs'",
+    "build": "bash tools/package.sh"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.0"
+  }
+}

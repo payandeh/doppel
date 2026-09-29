@@ -1,0 +1,53 @@
+name: Bug report
+description: Something isn't working as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting! Please fill in as much as you can.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: override
+    attributes:
+      label: The override
+      description: Paste the override (Manager → Export gives you JSON). Remove anything private.
+      render: json
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open ...
+        2. Right-click the request → Open using Doppel
+        3. ...
+  - type: input
+    id: chrome
+    attributes:
+      label: Chrome version
+      placeholder: "e.g. 146.0.7680.80 (from chrome://version)"
+    validations:
+      required: true
+  - type: input
+    id: doppel
+    attributes:
+      label: Doppel version
+      placeholder: "e.g. 1.3.0 (from chrome://extensions)"
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Request type
+      options: ["fetch", "XMLHttpRequest (axios, jQuery, …)", "Not sure"]
+  - type: textarea
+    id: console
+    attributes:
+      label: Console output
+      description: Any `[Doppel]` lines or errors from the page's Console.
+      render: text

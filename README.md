@@ -8,6 +8,13 @@
 Override the status code and JSON body of any REST call, straight from Chrome's Network tab. Keep as many overrides on at once as you like.</p>
 
 <p align="center">
+  <a href="https://github.com/payandeh/doppel/actions/workflows/ci.yml"><img src="https://github.com/payandeh/doppel/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/payandeh/doppel/releases/latest"><img src="https://img.shields.io/github/v/release/payandeh/doppel?color=FF6B5B" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/payandeh/doppel?color=14B8A6" alt="MIT license"></a>
+  <img src="https://img.shields.io/badge/Chrome-Manifest%20V3-0F1B24?logo=googlechrome&logoColor=white" alt="Chrome Manifest V3">
+</p>
+
+<p align="center">
   <img src="docs/network-menu.png" width="520" alt="Right-click a request in the Network tab → Open using Doppel">
 </p>
 
@@ -28,9 +35,9 @@ Doppel lets you:
 
 Doppel isn't on the Chrome Web Store yet.
 
-1. Download or clone this repo.
+1. Download `doppel-<version>.zip` from the [latest release](https://github.com/payandeh/doppel/releases/latest) and unzip it (or clone this repo).
 2. Open `chrome://extensions` and turn on **Developer mode**.
-3. Click **Load unpacked** and select the repo folder (the one with `manifest.json`).
+3. Click **Load unpacked** and select the unzipped folder (the one with `manifest.json`).
 4. Close DevTools if it's open, then open it again (DevTools only loads extensions when it opens).
 
 ## Use
@@ -92,6 +99,16 @@ fetches the real response (unless **Mock only** is on) and hands the page the ov
 
 No build step. Edit the files and reload the extension in `chrome://extensions`.
 
+```bash
+npm install
+npm test                          # static checks + unit tests
+npx playwright install chromium   # once
+npm run test:e2e                  # loads the extension in Chromium and tests real pages
+npm run build                     # dist/doppel-<version>.zip
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
+
 ```
 manifest.json        extension manifest (MV3)
 background.js        badge, editor window, folder auto-save
@@ -101,10 +118,11 @@ content/bridge.js    rule matching (isolated world)
 content/DOPPEL.js    marks overridden requests in the Initiator column
 lib/                 shared UI, matcher, JSON validator, folder sync
 lib/vendor/          bundled CodeMirror 6 JSON editor (MIT)
+tests/unit/          node:test unit tests
+tests/e2e/           Playwright tests with the real extension loaded
 ```
 
-- After editing `content/inject.js`, run `python3 tools/ignore-list.py` (keeps it out of DevTools stack traces).
-- `tools/package.sh` builds a zip for the Chrome Web Store in `dist/`.
+After editing `content/inject.js`, run `python3 tools/ignore-list.py` (keeps it out of DevTools stack traces; `npm test` reminds you).
 
 ## Brand
 
@@ -116,6 +134,10 @@ lib/vendor/          bundled CodeMirror 6 JSON editor (MIT)
 | ![](https://img.shields.io/badge/-%20-EEF9F7?style=flat-square) | Foam | `#EEF9F7` |
 
 The logo is two overlapping circles: the real response and its double, with the overlap where they look the same.
+
+## Contributing
+
+Issues and pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Report security problems privately, as described in [SECURITY.md](SECURITY.md).
 
 ## License
 

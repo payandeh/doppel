@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check the tag matches manifest.json
+        run: |
+          version=$(node -p "require('./manifest.json').version")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match manifest.json version $version"
+            exit 1
+          fi
+
+      - run: npm test
+
+      - name: Build extension zip
+        run: npm run build
+
+      - name: Release notes from CHANGELOG.md
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '
+            $0 ~ "^## \\[" v "\\]" { on = 1; next }
+            on && /^## \[/ { exit }
+            on && /^\[[^]]+\]: / { exit }
+            on { print }
+          ' CHANGELOG.md > notes.md
+          printf '\n---\n**Install:** download `doppel-%s.zip`, unzip it, then in `chrome://extensions` turn on Developer mode and click **Load unpacked**.\n' "$version" >> notes.md
+          cat notes.md
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/*.zip --title "Doppel ${GITHUB_REF_NAME#v}" --notes-file notes.md --verify-tag
