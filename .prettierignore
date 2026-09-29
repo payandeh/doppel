@@ -5,3 +5,5 @@ package-lock.json
 CHANGELOG.md
 *.png
 *.svg
+manifest.json
+.release-please-manifest.json

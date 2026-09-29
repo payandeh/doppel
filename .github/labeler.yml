@@ -1,0 +1,22 @@
+'area: content-script':
+  - changed-files:
+      - any-glob-to-any-file: ['content/**', 'lib/match.js']
+'area: devtools':
+  - changed-files:
+      - any-glob-to-any-file: ['devtools.*', 'panel.*', 'editor.*']
+'area: ui':
+  - changed-files:
+      - any-glob-to-any-file:
+          ['popup.*', 'manager.*', 'lib/editor.js', 'lib/rules-view.js', 'lib/styles.css', 'lib/core.js']
+'area: folder-sync':
+  - changed-files:
+      - any-glob-to-any-file: ['lib/folder-sync.js']
+'area: tests':
+  - changed-files:
+      - any-glob-to-any-file: ['tests/**']
+'area: ci':
+  - changed-files:
+      - any-glob-to-any-file: ['.github/**', 'tools/**', '.husky/**', '*.config.js']
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: ['**/*.md', 'docs/**']
