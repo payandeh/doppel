@@ -2,3 +2,6 @@ dist/
 node_modules/
 .DS_Store
 *.zip
+
+# Files saved from Claude chats
+Claude outputs/
