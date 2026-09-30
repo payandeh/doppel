@@ -29,6 +29,7 @@ Doppel lets you:
 
 - **Change the status code, the body, or both.** Leave either one empty and the real value from the server is kept.
 - **Run many overrides at once**, each with its own on/off switch, plus one switch to turn everything off.
+- **Organize them in groups**, nested as deep as you like. Collapse a group, switch a whole group off, or export just the groups you need.
 - **Start from the real response.** Right-click a request in the Network tab → **Open using Doppel**, and the current response is copied into the editor.
 - **Edit JSON properly** with syntax highlighting, folding, search, Beautify/Minify and a strict validator that points to the exact line and column of an error.
 - **Save your mocks to a folder** (`doppel.json`), so they survive reinstalling the extension, work on other computers and can live in Git with your team.
@@ -66,6 +67,20 @@ Manage everything from the toolbar popup or the manager page (right-click the to
 | Mock only     | Don't call the server at all                                                                     |
 
 When several overrides match the same request, the one higher in the list wins.
+
+### Groups
+
+Click **+ Group** to create a group, then drag overrides onto it (or use **Move to…** on a card, or the **Group** field in
+the editor). Groups can hold other groups.
+
+- **Collapse** a group with its arrow. Doppel remembers which groups are collapsed.
+- **Switch a group off** to pause everything inside it, including sub-groups. Each override keeps its own switch, so
+  turning the group back on restores exactly what was on before.
+- **Reorder** by dragging overrides and groups, or with **Move to top** / **Move up** / **Move down**. Groups and
+  overrides share one order, so an override can sit above a group. While you drag, a highlighted slot shows exactly
+  where the item will land. Top to bottom is also the priority order.
+- **Export** only what you need: **Export…** lets you tick groups and single overrides, and each group's **⋯** menu has
+  **Export this group**. Importing a file keeps its groups.
 
 ### Save to a folder
 

@@ -4,8 +4,10 @@ const view = mountRulesView(document.getElementById('rules'), {
 
 async function handleHash() {
   const h = location.hash;
-  if (h === '#new') openRuleEditor({ rule: APIOV.newRule(), isNew: true });
-  else if (h.startsWith('#edit=')) {
+  if (h === '#new' || h.startsWith('#new=')) {
+    const groupId = h.startsWith('#new=') ? decodeURIComponent(h.slice(5)) : null;
+    openRuleEditor({ rule: APIOV.newRule({ groupId }), isNew: true });
+  } else if (h.startsWith('#edit=')) {
     const id = h.slice(6);
     const { rules } = await APIOV.load();
     const rule = rules.find((r) => r.id === id);

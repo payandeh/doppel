@@ -27,7 +27,19 @@ export async function launch() {
         ([r, e]) =>
           chrome.storage.local.set({ apiov_rules: r, apiov_enabled: e, apiov_rev: Date.now() + Math.random() }),
         [rules, enabled]
-      )
+      ),
+    setState: ({ rules = [], groups = [], enabled = true }) =>
+      sw.evaluate(
+        ([r, g, e]) =>
+          chrome.storage.local.set({
+            apiov_rules: r,
+            apiov_groups: g,
+            apiov_enabled: e,
+            apiov_rev: Date.now() + Math.random()
+          }),
+        [rules, groups, enabled]
+      ),
+    getState: () => sw.evaluate(() => chrome.storage.local.get(['apiov_rules', 'apiov_groups']))
   };
 }
 
@@ -65,5 +77,7 @@ export const rule = (p) => ({
   updatedAt: 1,
   ...p
 });
+
+export const group = (id, p) => ({ id, name: id, parentId: null, enabled: true, updatedAt: 1, ...p });
 
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

@@ -9,7 +9,9 @@
   let items = [];
   let nextId = 1;
   let selectedId = null;
-  let state = { rules: [], enabled: true };
+  let state = { rules: [], groups: [], enabled: true };
+  let ordered = [];
+  let active = [];
 
   document.querySelectorAll('.tab').forEach((t) =>
     t.addEventListener('click', () => {
@@ -24,8 +26,9 @@
 
   function applyState(s) {
     state = s;
-    const active = s.rules.filter((r) => r.enabled).length;
-    $('ovr-count').textContent = s.rules.length ? active + '/' + s.rules.length : '';
+    ordered = APIOV.inOrder(s.rules, s.groups);
+    active = APIOV.activeRules(s.rules, s.groups);
+    $('ovr-count').textContent = s.rules.length ? active.length + '/' + s.rules.length : '';
     $('global-off').hidden = s.enabled;
     renderRows();
   }
@@ -76,7 +79,9 @@
   }
 
   function ruleFor(req, includeDisabled) {
-    return findRule(state.rules, req.request.url, req.request.method, includeDisabled);
+    return includeDisabled
+      ? findRule(ordered, req.request.url, req.request.method, true)
+      : findRule(active, req.request.url, req.request.method);
   }
 
   function visible(item) {
@@ -153,7 +158,7 @@
     if (selectedId !== item.id) return;
     const pretty = APIOV.prettyJson(content);
     $('pv-note').textContent =
-      rule && rule.enabled && state.enabled
+      rule && active.includes(rule) && state.enabled
         ? 'Real server response (page gets the override)'
         : content && !pretty
           ? 'Not JSON'

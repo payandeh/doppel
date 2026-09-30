@@ -2,7 +2,8 @@ const openManager = (hash = '') => chrome.tabs.create({ url: chrome.runtime.getU
 
 mountRulesView(document.getElementById('rules'), {
   compact: true,
-  onEdit: (rule, isNew) => openManager(isNew ? '#new' : '#edit=' + rule.id)
+  onEdit: (rule, isNew) =>
+    openManager(isNew ? '#new' + (rule.groupId ? '=' + encodeURIComponent(rule.groupId) : '') : '#edit=' + rule.id)
 });
 document.getElementById('manage').addEventListener('click', () => openManager());
 
