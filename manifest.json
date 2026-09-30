@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Doppel",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "A body double for your API responses — override the status code and JSON body of REST calls, many at once.",
   "permissions": [
     "storage",
