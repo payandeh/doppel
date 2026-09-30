@@ -4,6 +4,10 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    labels: [dependencies]
+    commit-message:
+      prefix: ci
+      include: scope
     groups:
       actions:
         patterns: ['*']
@@ -12,6 +16,10 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    labels: [dependencies]
+    commit-message:
+      prefix: chore
+      include: scope
     groups:
       dev-dependencies:
         dependency-type: development

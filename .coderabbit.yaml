@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+tone_instructions: 'Be concise and specific. Point to the exact line, explain the risk, and suggest a fix. Skip praise.'
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  collapse_walkthrough: true
+  sequence_diagrams: false
+  poem: false
+  in_progress_fortune: false
+  suggested_labels: false
+  auto_apply_labels: false
+  path_filters:
+    - '!lib/vendor/**'
+    - '!package-lock.json'
+    - '!**/*.png'
+    - '!**/*.svg'
+  path_instructions:
+    - path: '**/*.{js,mjs}'
+      instructions: |
+        - Flag comments that restate what the code does. Comments are only for non-obvious reasons (the "why").
+        - Prefer small, readable functions and early returns; no dead code or leftover debugging.
+        - This is a Manifest V3 extension with plain scripts and no bundler: no ES module imports in extension pages or content scripts.
+    - path: 'content/**'
+      instructions: |
+        - Security boundary: override rules must never be exposed to the page. The page (inject.js) may only receive the one rule matching a request it made, via bridge.js.
+        - inject.js runs in every page. Watch for behavior changes when no rule matches, performance on every fetch/XHR, and faithful emulation of fetch/XHR semantics (readyState, events, abort, timeout).
+        - After inject.js changes, its inline ignore-list source map must be regenerated (npm run ignore-list).
+    - path: 'lib/folder-sync.js'
+      instructions: 'Data safety first: never overwrite a user file that failed to parse, and check conflict handling between the folder and browser storage.'
+    - path: '**/*.{html,css}'
+      instructions: 'Check light and dark themes use the CSS variables in lib/styles.css, and that text contrast stays readable.'
+    - path: '.github/workflows/**'
+      instructions: 'Actions must be pinned to a full commit SHA with a version comment, use least-privilege permissions, and never interpolate untrusted input directly into run scripts.'
+    - path: 'tests/**'
+      instructions: 'Tests should assert user-visible behavior and avoid fixed sleeps where a condition can be awaited.'
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches: ['main']
+    ignore_title_keywords: ['WIP']
+  pre_merge_checks:
+    title:
+      mode: warning
+      requirements: 'Must follow Conventional Commits, e.g. "feat(editor): add HAR import" or "fix: handle XHR timeout".'
+    description:
+      mode: warning
+  tools:
+    eslint:
+      enabled: true
+    markdownlint:
+      enabled: true
+    actionlint:
+      enabled: true
+    zizmor:
+      enabled: true
+    gitleaks:
+      enabled: true
+    shellcheck:
+      enabled: true
+    yamllint:
+      enabled: true
+    htmlhint:
+      enabled: true
+    stylelint:
+      enabled: true
+    osvScanner:
+      enabled: true
+chat:
+  auto_reply: true
+knowledge_base:
+  learnings:
+    scope: local

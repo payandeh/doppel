@@ -5,7 +5,16 @@ import { launch, rule, sleep } from './helpers.mjs';
 let ext, page;
 before(async () => {
   ext = await launch();
-  await ext.setRules([rule({ id: 'r1', name: 'myBank', method: 'GET', matchType: 'equals', pattern: 'https://api.example.com/v1/wallet?page=1', status: 500 })]);
+  await ext.setRules([
+    rule({
+      id: 'r1',
+      name: 'myBank',
+      method: 'GET',
+      matchType: 'equals',
+      pattern: 'https://api.example.com/v1/wallet?page=1',
+      status: 500
+    })
+  ]);
   page = await ext.ctx.newPage();
   await page.goto(`chrome-extension://${ext.extId}/manager.html`);
   await sleep(300);

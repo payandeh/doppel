@@ -1,75 +1,157 @@
 <!doctype html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Doppel — Manager</title>
-  <link rel="stylesheet" href="lib/styles.css">
-  <style>
-    body { font-size: 13px; }
-    .wrap { max-width: 1000px; margin: 0 auto; padding: 20px 16px; }
-    h1 { font-size: 18px; margin: 0 0 4px; display: flex; gap: 8px; align-items: center; }
-    h1 img { width: 24px; height: 24px; }
-    .sub { color: var(--muted); margin: 0 0 16px; }
-    #rules { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-    h2.sec { font-size: 14px; margin: 24px 0 8px; }
-    .settings { border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
-    .howto { margin: 0; padding-left: 20px; line-height: 1.8; color: var(--muted); }
-    .howto b { color: var(--fg); }
-    .folder-line { display: flex; gap: 10px; align-items: flex-start; }
-    .folder-icon { font-size: 22px; line-height: 1; }
-    .folder-title { font-weight: 600; font-size: 13px; }
-    .folder-sub { color: var(--muted); margin-top: 2px; }
-    .folder-sub.ok { color: var(--ok); } .folder-sub.warn { color: var(--warn); } .folder-sub.bad { color: var(--bad); }
-    .folder-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 8px; }
-    .folder-banner { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin-bottom: 12px; border-radius: 8px;
-      background: color-mix(in srgb, var(--warn) 14%, transparent); border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); }
-    .folder-banner .spacer { flex: 1; }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <h1><img src="icons/icon48.png" alt=""> Doppel</h1>
-    <p class="sub">A body double for your API responses. Override the JSON body and/or status code of REST calls (fetch and XHR). Reload the page you're testing after turning on new overrides if requests already ran.</p>
-    <div class="folder-banner" id="folder-banner" hidden></div>
-    <div id="rules"></div>
-    <h2 class="sec">Save to a folder on your computer</h2>
-    <div class="settings folder-box" id="folder-box">
-      <div class="folder-line">
-        <span class="folder-icon">📁</span>
-        <div class="folder-text">
-          <div id="folder-title" class="folder-title">No folder selected</div>
-          <div id="folder-sub" class="folder-sub">Your overrides are only stored in this browser. If you remove the extension, they are lost.</div>
+  <head>
+    <meta charset="utf-8" />
+    <title>Doppel — Manager</title>
+    <link rel="stylesheet" href="lib/styles.css" />
+    <style>
+      body {
+        font-size: 13px;
+      }
+      .wrap {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px 16px;
+      }
+      h1 {
+        font-size: 18px;
+        margin: 0 0 4px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      h1 img {
+        width: 24px;
+        height: 24px;
+      }
+      .sub {
+        color: var(--muted);
+        margin: 0 0 16px;
+      }
+      #rules {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      h2.sec {
+        font-size: 14px;
+        margin: 24px 0 8px;
+      }
+      .settings {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px;
+      }
+      .howto {
+        margin: 0;
+        padding-left: 20px;
+        line-height: 1.8;
+        color: var(--muted);
+      }
+      .howto b {
+        color: var(--fg);
+      }
+      .folder-line {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .folder-icon {
+        font-size: 22px;
+        line-height: 1;
+      }
+      .folder-title {
+        font-weight: 600;
+        font-size: 13px;
+      }
+      .folder-sub {
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      .folder-sub.ok {
+        color: var(--ok);
+      }
+      .folder-sub.warn {
+        color: var(--warn);
+      }
+      .folder-sub.bad {
+        color: var(--bad);
+      }
+      .folder-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 10px 0 8px;
+      }
+      .folder-banner {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--warn) 14%, transparent);
+        border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+      }
+      .folder-banner .spacer {
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1><img src="icons/icon48.png" alt="" /> Doppel</h1>
+      <p class="sub">
+        A body double for your API responses. Override the JSON body and/or status code of REST calls (fetch and XHR).
+        Reload the page you're testing after turning on new overrides if requests already ran.
+      </p>
+      <div class="folder-banner" id="folder-banner" hidden></div>
+      <div id="rules"></div>
+      <h2 class="sec">Save to a folder on your computer</h2>
+      <div class="settings folder-box" id="folder-box">
+        <div class="folder-line">
+          <span class="folder-icon">📁</span>
+          <div class="folder-text">
+            <div id="folder-title" class="folder-title">No folder selected</div>
+            <div id="folder-sub" class="folder-sub">
+              Your overrides are only stored in this browser. If you remove the extension, they are lost.
+            </div>
+          </div>
         </div>
+        <div class="folder-actions">
+          <button class="btn primary" id="folder-choose">Choose folder…</button>
+          <button class="btn primary" id="folder-reconnect" hidden>Allow access</button>
+          <button class="btn" id="folder-sync" hidden>Sync now</button>
+          <button class="btn" id="folder-disconnect" hidden>Stop using this folder</button>
+        </div>
+        <p class="hint">
+          Overrides are saved to <code>doppel.json</code> in the folder you pick, and every change is saved
+          automatically. After reinstalling the extension (or on another computer), choose the same folder and your
+          overrides load again. You can also keep the folder in Git to share mocks with your team.
+        </p>
       </div>
-      <div class="folder-actions">
-        <button class="btn primary" id="folder-choose">Choose folder…</button>
-        <button class="btn primary" id="folder-reconnect" hidden>Allow access</button>
-        <button class="btn" id="folder-sync" hidden>Sync now</button>
-        <button class="btn" id="folder-disconnect" hidden>Stop using this folder</button>
-      </div>
-      <p class="hint">Overrides are saved to <code>doppel.json</code> in the folder you pick, and every change is saved automatically.
-      After reinstalling the extension (or on another computer), choose the same folder and your overrides load again.
-      You can also keep the folder in Git to share mocks with your team.</p>
-    </div>
 
-    <h2 class="sec">Settings</h2>
-    <div class="settings">
-      <label class="check"><input type="checkbox" id="set-panel"> Also show a <b>Doppel</b> tab in DevTools (request list with previews). Takes effect when you reopen DevTools.</label>
+      <h2 class="sec">Settings</h2>
+      <div class="settings">
+        <label class="check"
+          ><input type="checkbox" id="set-panel" /> Also show a <b>Doppel</b> tab in DevTools (request list with
+          previews). Takes effect when you reopen DevTools.</label
+        >
+      </div>
+      <h2 class="sec">How to override a request</h2>
+      <ol class="howto">
+        <li>Open DevTools → <b>Network</b> tab.</li>
+        <li>Right-click a request → <b>Open using Doppel</b>.</li>
+        <li>Edit the body and/or status (leave empty to keep the real one) → <b>Save</b>.</li>
+      </ol>
     </div>
-    <h2 class="sec">How to override a request</h2>
-    <ol class="howto">
-      <li>Open DevTools → <b>Network</b> tab.</li>
-      <li>Right-click a request → <b>Open using Doppel</b>.</li>
-      <li>Edit the body and/or status (leave empty to keep the real one) → <b>Save</b>.</li>
-    </ol>
-  </div>
-  <script src="lib/match.js"></script>
-  <script src="lib/json-check.js"></script>
-  <script src="lib/vendor/json-editor.js"></script>
-  <script src="lib/core.js"></script>
-  <script src="lib/editor.js"></script>
-  <script src="lib/rules-view.js"></script>
-  <script src="lib/folder-sync.js"></script>
-  <script src="manager.js"></script>
-</body>
+    <script src="lib/match.js"></script>
+    <script src="lib/json-check.js"></script>
+    <script src="lib/vendor/json-editor.js"></script>
+    <script src="lib/core.js"></script>
+    <script src="lib/editor.js"></script>
+    <script src="lib/rules-view.js"></script>
+    <script src="lib/folder-sync.js"></script>
+    <script src="manager.js"></script>
+  </body>
 </html>

@@ -1,0 +1,84 @@
+- name: bug
+  color: d73a4a
+  description: Something isn't working
+- name: enhancement
+  color: a2eeef
+  description: New feature or request
+- name: documentation
+  color: 0075ca
+  description: Improvements or additions to documentation
+- name: performance
+  color: fbca04
+  description: Makes something faster or lighter
+- name: refactor
+  color: c5def5
+  description: Code change that neither fixes a bug nor adds a feature
+- name: tests
+  color: bfd4f2
+  description: Adds or changes tests
+- name: build/ci
+  color: 5319e7
+  description: Build, tooling or CI changes
+- name: chore
+  color: ededed
+  description: Maintenance
+- name: breaking change
+  color: b60205
+  description: Changes existing behavior in a way users will notice
+- name: dependencies
+  color: 0366d6
+  description: Dependency updates
+- name: security
+  color: ee0701
+  description: Security-related
+- name: 'area: content-script'
+  color: FF6B5B
+  description: fetch/XHR interception and rule matching
+- name: 'area: devtools'
+  color: FF6B5B
+  description: DevTools integration and the editor window
+- name: 'area: ui'
+  color: FF6B5B
+  description: Popup, manager and shared UI
+- name: 'area: folder-sync'
+  color: FF6B5B
+  description: Saving overrides to a folder
+- name: 'area: tests'
+  color: 14B8A6
+  description: Test suite
+- name: 'area: ci'
+  color: 14B8A6
+  description: Workflows, hooks and tooling
+- name: needs triage
+  color: fef2c0
+  description: Waiting for a maintainer to look at it
+- name: good first issue
+  color: 7057ff
+  description: Good for newcomers
+- name: help wanted
+  color: 008672
+  description: Extra attention is needed
+- name: question
+  color: d876e3
+  description: Further information is requested
+- name: duplicate
+  color: cfd3d7
+  description: This issue or pull request already exists
+- name: invalid
+  color: e4e669
+  description: This doesn't seem right
+- name: wontfix
+  color: ffffff
+  description: This will not be worked on
+- name: stale
+  color: 6a737d
+  description: No recent activity
+- name: pinned
+  color: 0F1B24
+  description: Never marked as stale
+- name: 'autorelease: pending'
+  color: ededed
+  description: Used by release-please
+- name: 'autorelease: tagged'
+  color: ededed
+  description: Used by release-please

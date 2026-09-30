@@ -1,0 +1,2 @@
+node tools/check-branch.mjs --pre-push
+npm test

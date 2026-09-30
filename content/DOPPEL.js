@@ -1,6 +1,6 @@
-// Overridden requests are sent from this file on purpose: Chrome's
-// Network tab → Initiator column then shows "DOPPEL.js" for every
-// request Doppel is overriding (normal requests keep their own initiator).
+// Overridden requests are sent from here so the Network tab Initiator column shows DOPPEL.js.
 Object.defineProperty(window, Symbol.for('apiov.send'), {
-  value: function (fetchFn, input, init) { return fetchFn.call(window, input, init); }
+  value(fetchFn, input, init) {
+    return fetchFn.call(window, input, init);
+  }
 });
