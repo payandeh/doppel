@@ -5,6 +5,7 @@ import prettier from 'eslint-config-prettier';
 const shared = {
   APIOV: 'readonly',
   APIOV_MATCH: 'readonly',
+  APIOV_TREE: 'readonly',
   JsonCheck: 'readonly',
   JsonEditor: 'readonly',
   FolderSync: 'readonly',

@@ -2,6 +2,7 @@
 (() => {
   const KEY_RULES = 'apiov_rules';
   const KEY_ENABLED = 'apiov_enabled';
+  const KEY_GROUPS = 'apiov_groups';
   let enabled = true;
   let active = [];
   let loaded = false;
@@ -14,9 +15,10 @@
 
   function load() {
     try {
-      chrome.storage.local.get([KEY_RULES, KEY_ENABLED], (d) => {
+      chrome.storage.local.get([KEY_RULES, KEY_ENABLED, KEY_GROUPS], (d) => {
         enabled = d[KEY_ENABLED] !== false;
-        active = (Array.isArray(d[KEY_RULES]) ? d[KEY_RULES] : []).filter((r) => r && r.enabled);
+        const rules = (Array.isArray(d[KEY_RULES]) ? d[KEY_RULES] : []).filter(Boolean);
+        active = APIOV_MATCH.activeRules(rules, Array.isArray(d[KEY_GROUPS]) ? d[KEY_GROUPS] : []);
         loaded = true;
         announce();
       });
@@ -41,7 +43,7 @@
 
   try {
     chrome.storage.onChanged.addListener((changes, area) => {
-      if (area === 'local' && (changes[KEY_RULES] || changes[KEY_ENABLED])) load();
+      if (area === 'local' && (changes[KEY_RULES] || changes[KEY_ENABLED] || changes[KEY_GROUPS])) load();
     });
   } catch (_) {}
 

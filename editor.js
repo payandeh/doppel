@@ -1,6 +1,6 @@
 (async () => {
   const { apiov_draft: draft } = await chrome.storage.local.get('apiov_draft');
-  const { rules } = await APIOV.load();
+  const { rules, groups } = await APIOV.load();
   const close = () => window.close();
 
   if (!draft) {
@@ -8,7 +8,7 @@
     return;
   }
 
-  const existing = APIOV.findRule(rules, draft.url, draft.method, true);
+  const existing = APIOV.findRule(APIOV.inOrder(rules, groups), draft.url, draft.method, true);
   let note;
   if (existing) {
     note = 'An override already matches this request — editing it.';

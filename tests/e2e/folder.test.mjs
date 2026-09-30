@@ -1,7 +1,7 @@
 // Chrome's folder picker needs a real click, so tests use the origin-private file system instead.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { launch, rule, sleep } from './helpers.mjs';
+import { launch, rule, group, sleep } from './helpers.mjs';
 
 let ext, page;
 const names = async () =>
@@ -38,7 +38,10 @@ const openManager = async () => {
 
 before(async () => {
   ext = await launch();
-  await ext.setRules([rule({ id: 'a', name: 'A', pattern: '/a' }), rule({ id: 'b', name: 'B', pattern: '/b' })]);
+  await ext.setState({
+    groups: [group('g1', { name: 'Team', enabled: false })],
+    rules: [rule({ id: 'a', name: 'A', pattern: '/a', groupId: 'g1' }), rule({ id: 'b', name: 'B', pattern: '/b' })]
+  });
   await openManager();
 });
 after(() => ext.ctx.close());
@@ -89,6 +92,12 @@ test('after a "reinstall", choosing the same folder restores everything', async 
   await page.click('#folder-choose');
   await sleep(800);
   assert.equal(await names(), 'A,B,C');
+  const { apiov_groups: groups, apiov_rules: rules } = await ext.getState();
+  assert.deepEqual(
+    groups.map((x) => [x.id, x.name, x.enabled]),
+    [['g1', 'Team', false]]
+  );
+  assert.equal(rules.find((r) => r.id === 'a').groupId, 'g1');
 });
 
 test('a broken file is reported and never overwritten', async () => {

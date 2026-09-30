@@ -1,9 +1,9 @@
-importScripts('lib/folder-sync.js');
+importScripts('lib/match.js', 'lib/folder-sync.js');
 
 async function updateBadge() {
-  const d = await chrome.storage.local.get(['apiov_rules', 'apiov_enabled']);
+  const d = await chrome.storage.local.get(['apiov_rules', 'apiov_enabled', 'apiov_groups']);
   const on = d.apiov_enabled !== false;
-  const n = (d.apiov_rules || []).filter((r) => r.enabled).length;
+  const n = APIOV_MATCH.activeRules(d.apiov_rules || [], d.apiov_groups || []).length;
   await chrome.action.setBadgeText({ text: !on ? 'off' : n ? String(n) : '' });
   await chrome.action.setBadgeBackgroundColor({ color: on ? '#FF6B5B' : '#6b7280' });
   if (chrome.action.setBadgeTextColor) await chrome.action.setBadgeTextColor({ color: on ? '#0F1B24' : '#ffffff' });
@@ -12,7 +12,7 @@ async function updateBadge() {
 chrome.runtime.onInstalled.addListener(updateBadge);
 chrome.runtime.onStartup.addListener(updateBadge);
 chrome.storage.onChanged.addListener((c, area) => {
-  if (area === 'local' && (c.apiov_rules || c.apiov_enabled)) updateBadge();
+  if (area === 'local' && (c.apiov_rules || c.apiov_enabled || c.apiov_groups)) updateBadge();
 });
 
 async function openEditorWindow() {
