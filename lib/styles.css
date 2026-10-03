@@ -669,6 +669,17 @@ button.json-state.bad {
 .confirm-msg {
   white-space: pre-line;
 }
+.modal.confirm.prompt {
+  width: min(460px, 100%);
+}
+.prompt-sub {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: -6px;
+}
+.prompt-input {
+  width: 100%;
+}
 
 .rule {
   position: relative;

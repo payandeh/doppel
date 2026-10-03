@@ -54,6 +54,12 @@ test('toggle and duplicate from the card', async () => {
   await sleep(200);
   assert.equal((await rules())[0].enabled, false);
   await page.click('.rule[data-id="r1"] [data-act=dup]');
+  const original = (await rules())[0].name || '';
+  assert.equal(await page.inputValue('.prompt-input'), original);
+  await page.fill('.prompt-input', 'Renamed copy');
+  await page.click('.modal.prompt [data-v="1"]');
   await sleep(200);
-  assert.equal((await rules()).length, 2);
+  const after = await rules();
+  assert.equal(after.length, 2);
+  assert.ok(after.some((r) => r.name === 'Renamed copy'));
 });
