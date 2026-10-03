@@ -1,6 +1,6 @@
 {
   "name": "doppel",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
   "description": "A body double for your API responses — Chrome extension to override REST API status codes and JSON bodies.",
   "license": "MIT",
