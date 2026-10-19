@@ -9,6 +9,7 @@ const shared = {
   JsonCheck: 'readonly',
   JsonEditor: 'readonly',
   FolderSync: 'readonly',
+  Native: 'readonly',
   openRuleEditor: 'readonly',
   mountRulesView: 'readonly'
 };

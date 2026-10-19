@@ -1,4 +1,6 @@
-importScripts('lib/match.js', 'lib/folder-sync.js');
+importScripts('lib/match.js', 'lib/folder-sync.js', 'lib/native.js');
+
+Native.init();
 
 async function updateBadge() {
   const d = await chrome.storage.local.get(['apiov_rules', 'apiov_enabled', 'apiov_groups']);

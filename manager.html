@@ -137,6 +137,18 @@
           ><input type="checkbox" id="set-panel" /> Also show a <b>Doppel</b> tab in DevTools (request list with
           previews). Takes effect when you reopen DevTools.</label
         >
+        <label class="check"
+          ><input type="checkbox" id="set-native" /> Show overrides in Chrome's own <b>Network</b> tab. Doppel then
+          applies overrides through Chrome's debugger, so Chrome shows a “Doppel started debugging this browser” bar.
+          This only happens while DevTools is open on a site where Doppel has overridden a request, and never when
+          Doppel is turned off. On a new site the first override still happens in the page; after that, and after
+          reloads, they show in the Network tab.</label
+        >
+        <p class="hint">
+          Overridden rows get an <code>x-doppel</code> response header. To spot them, right-click the Network table
+          header → <b>Response Headers</b> → <b>Manage Header Columns…</b> → add <code>x-doppel</code>, or filter with
+          <code>has-response-header:x-doppel</code>.
+        </p>
       </div>
       <h2 class="sec">How to override a request</h2>
       <ol class="howto">

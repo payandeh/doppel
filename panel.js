@@ -78,6 +78,56 @@
     });
   }
 
+  // ---- What the page actually received (reported by Doppel for overridden requests) ----
+  const noHash = (u) => String(u).split('#')[0];
+  const sameReq = (req, rec) =>
+    noHash(req.request.url) === noHash(rec.url) && req.request.method.toUpperCase() === rec.method.toUpperCase();
+  let pending = [];
+
+  function mockedReq(rec) {
+    const body = rec.body || '';
+    return {
+      _doppel: true,
+      _resourceType: rec.kind || 'fetch',
+      request: { url: rec.url, method: rec.method },
+      response: { status: rec.status, content: { mimeType: 'application/json', size: body.length }, _transferSize: 0 },
+      time: 0,
+      getContent: (cb) => cb(body, '')
+    };
+  }
+
+  function refreshRow(item) {
+    const tr = document.querySelector(`#rows tr[data-id="${item.id}"]`);
+    if (tr) tr.outerHTML = rowHtml(item);
+    if (selectedId === item.id) openPreview(item);
+  }
+
+  function onApplied(rec, quiet) {
+    // Mocked by the page patch: nothing went over the network, so Chrome has no entry for it.
+    if (rec.via === 'page' && rec.mocked) {
+      const item = add(mockedReq(rec), quiet);
+      item.applied = rec;
+      if (!quiet) refreshRow(item);
+      return;
+    }
+    for (let i = items.length - 1; i >= 0; i--) {
+      const it = items[i];
+      if (!it.applied && !it.req._doppel && sameReq(it.req, rec)) {
+        it.applied = rec;
+        if (!quiet) refreshRow(it);
+        return;
+      }
+    }
+    // The network entry has not finished yet; attach it when it arrives.
+    pending = pending.filter((p) => Date.now() - p.at < 60000).slice(-200);
+    pending.push(rec);
+  }
+
+  function takePending(req) {
+    const i = pending.findIndex((rec) => sameReq(req, rec));
+    return i < 0 ? null : pending.splice(i, 1)[0];
+  }
+
   function ruleFor(req, includeDisabled) {
     return includeDisabled
       ? findRule(ordered, req.request.url, req.request.method, true)
@@ -96,16 +146,25 @@
     const rule = state.enabled ? ruleFor(req, false) : null;
     const disabledRule = !rule ? ruleFor(req, true) : null;
     const realStatus = req.response.status;
+    const ap = item.applied;
     let statusCell = realStatus
       ? `<span class="st ${statusClass(realStatus)}">${realStatus}</span>`
       : '<span class="muted">(failed)</span>';
-    if (rule) {
+    if (ap) {
+      const from = ap.realStatus;
+      statusCell = from ? `<span class="st ${statusClass(from)}">${from}</span>` : '';
+      if (!from || from !== ap.status)
+        statusCell += `${from ? ' → ' : ''}<span class="st ${statusClass(ap.status)}">${ap.status}</span>`;
+      statusCell += ap.mocked
+        ? '<span class="pill" title="Mocked by Doppel — no network request was made">mocked</span>'
+        : '<span class="pill" title="The page received Doppel\'s override">overridden</span>';
+    } else if (rule) {
       if (rule.status) statusCell += ` → <span class="st ${statusClass(rule.status)}">${rule.status}</span>`;
       statusCell += '<span class="pill" title="Response is overridden in the page">overridden</span>';
     } else if (disabledRule) {
       statusCell += '<span class="pill off" title="A matching override exists but is disabled">off</span>';
     }
-    return `<tr data-id="${item.id}" class="${rule ? 'ovr' : ''} ${item.id === selectedId ? 'sel' : ''}">
+    return `<tr data-id="${item.id}" class="${rule || ap ? 'ovr' : ''} ${item.id === selectedId ? 'sel' : ''}">
       <td class="c-name" title="${esc(req.request.url)}">${esc(nameOf(req.request.url))}</td>
       <td class="c-method">${esc(req.request.method)}</td>
       <td class="c-status">${statusCell}</td>
@@ -120,17 +179,19 @@
     $('net-empty').hidden = shown.length > 0;
   }
 
-  function add(req) {
+  function add(req, quiet) {
     const item = { id: nextId++, req };
+    if (!req._doppel) item.applied = takePending(req);
     items.push(item);
     if (items.length > 1500) items.shift();
-    if (visible(item)) {
+    if (!quiet && visible(item)) {
       const wrap = document.querySelector('.table-wrap');
       const atBottom = wrap.scrollTop + wrap.clientHeight >= wrap.scrollHeight - 30;
       $('rows').insertAdjacentHTML('beforeend', rowHtml(item));
       $('net-empty').hidden = true;
       if (atBottom) wrap.scrollTop = wrap.scrollHeight;
     }
+    return item;
   }
 
   const byId = (id) => items.find((i) => i.id === Number(id));
@@ -154,19 +215,39 @@
     const rule = ruleFor(req, true);
     $('pv-override').textContent = rule ? 'Edit override' : 'Override API';
     showPreviewMessage('Loading…');
-    const content = await getContent(req);
+    const { content, note } = await shownContent(item);
     if (selectedId !== item.id) return;
     const pretty = APIOV.prettyJson(content);
-    $('pv-note').textContent =
-      rule && active.includes(rule) && state.enabled
-        ? 'Real server response (page gets the override)'
-        : content && !pretty
-          ? 'Not JSON'
-          : '';
+    const ap = item.applied;
+    const canToggle = !!ap && ap.via === 'page' && ap.body !== undefined && !ap.mocked;
+    $('pv-toggle').hidden = !canToggle;
+    $('pv-toggle').textContent = item.showReal ? 'Show override' : 'Show real response';
+    $('pv-note').textContent = note || (content && !pretty ? 'Not JSON' : '');
     const text = pretty ?? content;
     if (!text) return showPreviewMessage('(no response body)');
     showPreviewText(text.length > 2000000 ? text.slice(0, 2000000) + '\n… (truncated)' : text);
   }
+  // The override when Doppel reported one, otherwise what Chrome recorded.
+  async function shownContent(item) {
+    const ap = item.applied;
+    const rule = ruleFor(item.req, true);
+    if (ap && ap.mocked) return { content: ap.body || '', note: 'Mocked by Doppel — no network request' };
+    if (ap && ap.body !== undefined && !item.showReal)
+      return {
+        content: ap.body,
+        note:
+          ap.via === 'network'
+            ? 'Overridden (also shown in Chrome’s Network tab)'
+            : 'Overridden — what the page received'
+      };
+    const content = await getContent(item.req);
+    if (ap) return { content, note: ap.body !== undefined ? 'Real server response' : 'Status overridden, real body' };
+    return {
+      content,
+      note: rule && active.includes(rule) && state.enabled ? 'Real server response (page gets the override)' : ''
+    };
+  }
+
   let viewer = null;
   function showPreviewMessage(msg) {
     if (viewer) {
@@ -195,10 +276,16 @@
     const it = byId(selectedId);
     if (it) overrideFrom(it.req);
   });
+  $('pv-toggle').addEventListener('click', () => {
+    const it = byId(selectedId);
+    if (!it) return;
+    it.showReal = !it.showReal;
+    openPreview(it);
+  });
   $('pv-copy').addEventListener('click', async () => {
     const it = byId(selectedId);
     if (!it) return;
-    const c = await getContent(it.req);
+    const { content: c } = await shownContent(it);
     await APIOV.copyText(APIOV.prettyJson(c) ?? c);
     APIOV.toast('Response copied');
   });
@@ -276,7 +363,7 @@
         APIOV.toast('URL copied');
       }
       if (c === 'copy-resp') {
-        const content = await getContent(item.req);
+        const { content } = await shownContent(item);
         await APIOV.copyText(APIOV.prettyJson(content) ?? content);
         APIOV.toast('Response copied');
       }
@@ -290,13 +377,16 @@
   });
   window.addEventListener('blur', hideCtx);
 
-  window.apiovConnect = ({ entries, subscribe }) => {
+  window.apiovConnect = ({ entries, applied = [], subscribe }) => {
     entries.forEach((req) => items.push({ id: nextId++, req }));
+    applied.forEach((rec) => onApplied(rec, true));
     renderRows();
     const unsub = subscribe((msg) => {
       if (msg.type === 'add') add(msg.req);
+      if (msg.type === 'applied') onApplied(msg.rec);
       if (msg.type === 'navigated' && !$('preserve').checked) {
         items = [];
+        pending = [];
         closePreview();
         renderRows();
       }
