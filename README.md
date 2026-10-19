@@ -57,16 +57,33 @@ Manage everything from the toolbar popup or the manager page (right-click the to
 
 ### Override options
 
-| Option        | What it does                                                                                     |
-| ------------- | ------------------------------------------------------------------------------------------------ |
-| Method        | `ANY`, or a specific HTTP method                                                                 |
-| URL match     | **Equals** (optionally ignoring the query string), **Contains**, **Wildcard** (`*`) or **Regex** |
-| Status code   | 200–599. Empty = keep the server's status                                                        |
-| Response body | JSON. Empty = keep the server's body                                                             |
-| Delay         | Wait before responding (ms)                                                                      |
-| Mock only     | Don't call the server at all                                                                     |
+| Option         | What it does                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------ |
+| Method         | `ANY`, or a specific HTTP method                                                                 |
+| URL match      | **Equals** (optionally ignoring the query string), **Contains**, **Wildcard** (`*`) or **Regex** |
+| Status code    | 200–599. Empty = keep the server's status                                                        |
+| Response body  | JSON. Empty = keep the server's body                                                             |
+| Delay          | Wait before responding (ms)                                                                      |
+| Mock only      | Don't call the server at all                                                                     |
+| Use only after | Wait until another override has answered a request on the page, then take priority               |
 
 When several overrides match the same request, the one higher in the list wins.
+
+### Sequences: a different response after another call
+
+Say the page calls **B** before and after calling **A**, and B should answer differently the second time:
+
+1. Override **A** as usual.
+2. Create **B1** for B with the first response.
+3. Duplicate it as **B2**, change the response, and set **Use only after** to **A**.
+
+Now B gets B1 until A has been called, then B2. An override with **Use only after** is skipped until the override it
+waits for has answered a request on the page; from then on it wins over the other overrides for the same URL, wherever
+it sits in the list. Steps can chain (B3 after C, and so on); if several are ready, the one whose trigger ran last
+wins. Reloading the page starts over.
+
+To react to a call you don't want to change, give it an override with an empty status and body: it passes the real
+response through but still counts as "has run".
 
 ### Groups
 
