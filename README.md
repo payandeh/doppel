@@ -115,16 +115,76 @@ _"make `/api/orders` return a 500 with an error message"_ and the agent adds the
 else.
 
 1. Set up **Save to a folder** (above) so `doppel.json` exists.
-2. Register the server with your agent, passing that folder:
+2. Register the server with your agent. Every client runs the same command, `node <doppel repo>/mcp/server.mjs <your
+Doppel folder>`; only the config file differs. Use **absolute paths**, since most clients don't expand `~`.
+
+   <details>
+   <summary><b>Claude Code</b></summary>
 
    ```bash
-   # Claude Code
    claude mcp add doppel -- node /path/to/doppel/mcp/server.mjs /path/to/your/doppel-folder
    ```
 
-   ```jsonc
-   // Claude Desktop, Cursor and others: add to the MCP servers config
-   "doppel": { "command": "node", "args": ["/path/to/doppel/mcp/server.mjs", "/path/to/your/doppel-folder"] }
+   </details>
+
+   <details>
+   <summary><b>Cursor</b>, <b>Claude Desktop</b>, <b>Windsurf</b> and other <code>mcpServers</code> clients</summary>
+
+   Config file: Cursor `~/.cursor/mcp.json` (or `.cursor/mcp.json` in a project), Claude Desktop
+   `claude_desktop_config.json` (Settings → Developer → Edit Config), Windsurf `~/.codeium/windsurf/mcp_config.json`.
+
+   ```json
+   {
+     "mcpServers": {
+       "doppel": {
+         "command": "node",
+         "args": ["/path/to/doppel/mcp/server.mjs", "/path/to/your/doppel-folder"]
+       }
+     }
+   }
+   ```
+
+   </details>
+
+   <details>
+   <summary><b>VS Code</b> (Copilot agent mode)</summary>
+
+   `.vscode/mcp.json`. Note the key is `servers`, not `mcpServers`:
+
+   ```json
+   {
+     "servers": {
+       "doppel": {
+         "type": "stdio",
+         "command": "node",
+         "args": ["/path/to/doppel/mcp/server.mjs", "/path/to/your/doppel-folder"]
+       }
+     }
+   }
+   ```
+
+   </details>
+
+   <details>
+   <summary><b>Codex CLI</b></summary>
+
+   `~/.codex/config.toml`:
+
+   ```toml
+   [mcp_servers.doppel]
+   command = "node"
+   args = ["/path/to/doppel/mcp/server.mjs", "/path/to/your/doppel-folder"]
+   ```
+
+   </details>
+
+   **Server doesn't start or shows no tools?** Apps opened from the Dock or Start menu often can't find a `node`
+   installed with nvm, fnm or Volta. Run `which node` (`where node` on Windows) and put that full path in `command`.
+   To check the server and folder outside any agent, run this. It prints how many overrides it found, or what's wrong:
+
+   ```bash
+   echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"doppel_status"}}' \
+     | node /path/to/doppel/mcp/server.mjs /path/to/your/doppel-folder
    ```
 
 3. Ask for a mock, then **reload the page**. Doppel reads the file before the page's first request, and also checks it
