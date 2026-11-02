@@ -30,6 +30,17 @@ handleHash();
   });
 })();
 
+(async () => {
+  const el = document.getElementById('set-native');
+  const { apiov_settings: st = {} } = await chrome.storage.local.get('apiov_settings');
+  el.checked = !!st.nativeNetwork;
+  el.addEventListener('change', async () => {
+    const { apiov_settings: cur = {} } = await chrome.storage.local.get('apiov_settings');
+    await chrome.storage.local.set({ apiov_settings: { ...cur, nativeNetwork: el.checked } });
+    APIOV.toast(el.checked ? 'Saved — applies to tabs with DevTools open' : 'Saved');
+  });
+})();
+
 (() => {
   const $ = (id) => document.getElementById(id);
   const when = (t) => (t ? new Date(t).toLocaleString() : '');
