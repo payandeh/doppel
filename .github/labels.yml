@@ -43,6 +43,9 @@
 - name: 'area: folder-sync'
   color: FF6B5B
   description: Saving overrides to a folder
+- name: 'area: mcp'
+  color: FF6B5B
+  description: The MCP server for AI agents
 - name: 'area: tests'
   color: 14B8A6
   description: Test suite

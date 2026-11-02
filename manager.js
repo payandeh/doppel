@@ -151,6 +151,12 @@ handleHash();
 
   FolderSync.watch(show);
   refresh();
+  setInterval(() => {
+    if (!document.hidden)
+      FolderSync.poll()
+        .then((s) => s && show(s))
+        .catch(() => {});
+  }, 2000);
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) refresh();
   });

@@ -11,6 +11,9 @@
 'area: folder-sync':
   - changed-files:
       - any-glob-to-any-file: ['lib/folder-sync.js']
+'area: mcp':
+  - changed-files:
+      - any-glob-to-any-file: ['mcp/**']
 'area: tests':
   - changed-files:
       - any-glob-to-any-file: ['tests/**']

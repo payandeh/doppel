@@ -42,7 +42,7 @@ export default [
     languageOptions: { globals: { ...globals.serviceworker, ...globals.webextensions, ...shared } }
   },
   {
-    files: ['tools/**/*.mjs', 'tests/**/*.mjs', '*.config.js'],
+    files: ['tools/**/*.mjs', 'mcp/**/*.mjs', 'tests/**/*.mjs', '*.config.js'],
     languageOptions: { sourceType: 'module', globals: { ...globals.node } },
     rules: { 'no-console': 'off' }
   },

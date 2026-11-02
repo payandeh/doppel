@@ -30,6 +30,11 @@ reviews:
         - After inject.js changes, its inline ignore-list source map must be regenerated (npm run ignore-list).
     - path: 'lib/folder-sync.js'
       instructions: 'Data safety first: never overwrite a user file that failed to parse, and check conflict handling between the folder and browser storage.'
+    - path: 'mcp/**'
+      instructions: |
+        - Node-only MCP server over stdio with no dependencies. stdout carries protocol messages only; logs go to stderr.
+        - It edits the user's doppel.json: never create the file, never write after a failed parse, and write atomically (temp file + rename).
+        - Rules it writes must match what lib/folder-sync.js normalize() and the editor would produce.
     - path: '**/*.{html,css}'
       instructions: 'Check light and dark themes use the CSS variables in lib/styles.css, and that text contrast stays readable.'
     - path: '.github/workflows/**'

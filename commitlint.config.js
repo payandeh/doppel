@@ -4,7 +4,21 @@ export default {
     'scope-enum': [
       1,
       'always',
-      ['content', 'devtools', 'editor', 'popup', 'manager', 'panel', 'folder', 'ui', 'deps', 'ci', 'release', 'docs']
+      [
+        'content',
+        'devtools',
+        'editor',
+        'popup',
+        'manager',
+        'panel',
+        'folder',
+        'mcp',
+        'ui',
+        'deps',
+        'ci',
+        'release',
+        'docs'
+      ]
     ],
     'body-max-line-length': [1, 'always', 120]
   }
