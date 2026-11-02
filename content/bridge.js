@@ -27,15 +27,33 @@
       }
     });
 
+  // Lets a doppel.json edit made since the last sync apply to this very page load. Capped so a slow disk can't stall the page.
+  const pollFolder = () =>
+    new Promise((resolve) => {
+      if (window !== window.top) return resolve();
+      setTimeout(resolve, 300);
+      try {
+        chrome.runtime.sendMessage({ type: 'apiov:folder-poll' }, () => {
+          void chrome.runtime.lastError;
+          resolve();
+        });
+      } catch (_) {
+        resolve();
+      }
+    });
+
   function load() {
     try {
-      const rulesP = new Promise((resolve) =>
-        chrome.storage.local.get([KEY_RULES, KEY_ENABLED, KEY_GROUPS], (d) => {
-          enabled = d[KEY_ENABLED] !== false;
-          const rules = (Array.isArray(d[KEY_RULES]) ? d[KEY_RULES] : []).filter(Boolean);
-          active = APIOV_MATCH.activeRules(rules, Array.isArray(d[KEY_GROUPS]) ? d[KEY_GROUPS] : []);
-          resolve();
-        })
+      const rulesP = (loaded ? Promise.resolve() : pollFolder()).then(
+        () =>
+          new Promise((resolve) =>
+            chrome.storage.local.get([KEY_RULES, KEY_ENABLED, KEY_GROUPS], (d) => {
+              enabled = d[KEY_ENABLED] !== false;
+              const rules = (Array.isArray(d[KEY_RULES]) ? d[KEY_RULES] : []).filter(Boolean);
+              active = APIOV_MATCH.activeRules(rules, Array.isArray(d[KEY_GROUPS]) ? d[KEY_GROUPS] : []);
+              resolve();
+            })
+          )
       );
       Promise.all([rulesP, loaded ? null : askNative().then((on) => (native = on))]).then(() => {
         loaded = true;

@@ -108,6 +108,33 @@ Manager page → **Save to a folder on your computer** → **Choose folder…**.
 - Chrome asks for folder permission again after a browser restart. Click **Allow access** in the manager.
 - A broken `doppel.json` is never overwritten. Doppel shows the error instead.
 
+### Let an AI agent add overrides (MCP)
+
+`mcp/server.mjs` is an [MCP](https://modelcontextprotocol.io) server that edits the same `doppel.json`, so you can say
+_"make `/api/orders` return a 500 with an error message"_ and the agent adds the override. It needs Node 20+ and nothing
+else.
+
+1. Set up **Save to a folder** (above) so `doppel.json` exists.
+2. Register the server with your agent, passing that folder:
+
+   ```bash
+   # Claude Code
+   claude mcp add doppel -- node /path/to/doppel/mcp/server.mjs /path/to/your/doppel-folder
+   ```
+
+   ```jsonc
+   // Claude Desktop, Cursor and others: add to the MCP servers config
+   "doppel": { "command": "node", "args": ["/path/to/doppel/mcp/server.mjs", "/path/to/your/doppel-folder"] }
+   ```
+
+3. Ask for a mock, then **reload the page**. Doppel reads the file before the page's first request, and also checks it
+   every few seconds while the manager is open (and every 30 seconds otherwise).
+
+Tools: `doppel_status`, `list_overrides`, `get_override`, `add_override`, `update_override`, `delete_override`,
+`list_groups`, `set_enabled`. New overrides go to the top of their group, like ones added in the editor. Groups can be
+given as a path (`"Checkout / Errors"`) and are created if needed. After a browser restart, click **Allow access** in the
+manager once, or Doppel can't read the folder.
+
 ### Seeing overrides in the Network tab
 
 Overridden requests show **`DOPPEL.js`** in the Network tab's **Initiator** column, and each one is logged in the Console as `[Doppel] …`.

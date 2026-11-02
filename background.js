@@ -44,6 +44,12 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
       chrome.storage.session.set({ devtoolsTabs });
     });
   }
+  if (msg.type === 'apiov:folder-poll') {
+    FolderSync.poll()
+      .catch(() => null)
+      .then(() => reply({}));
+    return true;
+  }
   if (msg.type === 'apiov:devtools-status') {
     chrome.storage.session
       .get('devtoolsTabs')
@@ -58,3 +64,10 @@ chrome.windows.onRemoved.addListener(async (id) => {
 
 FolderSync.watch();
 chrome.runtime.onStartup.addListener(() => FolderSync.sync().catch(() => {}));
+
+// Picks up doppel.json edits (e.g. from the MCP server) even when no page is loading. 30s is Chrome's minimum period.
+const POLL_ALARM = 'apiov-folder-poll';
+chrome.alarms.get(POLL_ALARM).then((a) => a || chrome.alarms.create(POLL_ALARM, { periodInMinutes: 0.5 }));
+chrome.alarms.onAlarm.addListener((a) => {
+  if (a.name === POLL_ALARM) FolderSync.poll().catch(() => {});
+});

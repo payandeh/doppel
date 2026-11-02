@@ -1,7 +1,7 @@
 // Chrome's folder picker needs a real click, so tests use the origin-private file system instead.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { launch, rule, group, sleep } from './helpers.mjs';
+import { launch, rule, group, sleep, server } from './helpers.mjs';
 
 let ext, page;
 const names = async () =>
@@ -110,4 +110,32 @@ test('a broken file is reported and never overwritten', async () => {
     return (await (await d.getFileHandle('doppel.json')).getFile()).text();
   });
   assert.equal(raw, '{ "rules": [ oops ');
+});
+
+test('an outside edit to doppel.json (e.g. from the MCP server) applies on the next page load', async () => {
+  const file = {
+    app: 'doppel',
+    version: 2,
+    enabled: true,
+    groups: [],
+    rules: [
+      { id: 'm', name: 'From agent', enabled: true, method: 'ANY', matchType: 'contains', pattern: '/api/early' },
+      { id: 'n', name: 'Later', enabled: true, method: 'ANY', matchType: 'contains', pattern: '/api/later' }
+    ].map((r, i) => ({ ...r, status: 503, body: `{"mocked":${i}}`, updatedAt: Date.now() }))
+  };
+  await writeFile(JSON.stringify(file));
+  await page.close();
+  const api = await server();
+  try {
+    const web = await ext.ctx.newPage();
+    await web.goto(api.base + '/');
+    assert.equal(await web.evaluate(() => window.early), 503);
+    assert.equal(await names(), 'From agent,Later');
+    const later = await web.evaluate(() => fetch('/api/later').then((r) => r.text()));
+    assert.equal(later, '{"mocked":1}');
+    await web.close();
+  } finally {
+    api.srv.close();
+    await openManager();
+  }
 });
