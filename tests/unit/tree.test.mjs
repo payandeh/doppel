@@ -128,3 +128,19 @@ test('importing an old flat file still works', () => {
   assert.equal(out.added, 1);
   assert.equal(out.rules[0].groupId, null);
 });
+
+test('importing remaps "after" to the new id of the override it waits for', () => {
+  const local = [rule('a'), rule('b1')];
+  const incoming = T.parseImport({
+    version: 2,
+    rules: [rule('a'), rule('b2', null, { pattern: '/b1', after: 'a' }), rule('x', null, { after: 'b1' })]
+  });
+  const out = T.importData(local, [], incoming);
+  const a2 = out.rules.find((r) => r.pattern === '/a' && r.id !== 'a');
+  assert.equal(out.rules.find((r) => r.pattern === '/b1' && r.after).after, a2.id);
+  assert.equal(
+    out.rules.find((r) => r.pattern === '/x').after,
+    'b1',
+    'points at a local override when not in the file'
+  );
+});

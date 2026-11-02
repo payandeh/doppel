@@ -988,3 +988,16 @@ button.json-state.bad {
   white-space: nowrap;
   min-width: 0;
 }
+
+.tag-after {
+  background: var(--teal-soft);
+  color: var(--teal);
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tag-warn {
+  background: color-mix(in srgb, var(--warn) 16%, transparent);
+  color: var(--warn);
+}

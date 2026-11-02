@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { loadScript } from './load.mjs';
 
-const { matches, findRule } = loadScript('lib/match.js', 'APIOV_MATCH');
+const { matches, findRule, sequence } = loadScript('lib/match.js', 'APIOV_MATCH');
 const rule = (p) => ({ enabled: true, method: 'ANY', matchType: 'equals', ignoreQuery: false, ...p });
 
 test('equals, with and without query string', () => {
@@ -49,4 +49,50 @@ test('first enabled match wins; disabled rules skipped unless asked', () => {
   assert.equal(findRule(rules, 'https://x.io/a', 'GET').id, 'first');
   assert.equal(findRule(rules, 'https://x.io/a', 'GET', true).id, 'off');
   assert.equal(findRule(rules, 'https://x.io/b', 'GET'), null);
+});
+
+test('an "after" override waits for its trigger, then wins (A, B1 / B2 after A)', () => {
+  const rules = [
+    rule({ id: 'a', pattern: 'https://x.io/a' }),
+    rule({ id: 'b1', pattern: 'https://x.io/b' }),
+    rule({ id: 'b2', pattern: 'https://x.io/b', after: 'a' })
+  ];
+  const seq = sequence();
+  assert.equal(seq.pick(rules, 'https://x.io/b', 'GET').id, 'b1');
+  assert.equal(seq.pick(rules, 'https://x.io/b', 'GET').id, 'b1');
+  assert.equal(seq.pick(rules, 'https://x.io/a', 'GET').id, 'a');
+  assert.equal(seq.pick(rules, 'https://x.io/b', 'GET').id, 'b2');
+  assert.equal(seq.pick(rules, 'https://x.io/b', 'GET').id, 'b2');
+  seq.reset();
+  assert.equal(seq.pick(rules, 'https://x.io/b', 'GET').id, 'b1');
+});
+
+test('"after" beats list order, and the most recent trigger wins among several', () => {
+  const rules = [
+    rule({ id: 'b3', pattern: 'https://x.io/b', after: 'c' }),
+    rule({ id: 'b2', pattern: 'https://x.io/b', after: 'a' }),
+    rule({ id: 'a', pattern: 'https://x.io/a' }),
+    rule({ id: 'c', pattern: 'https://x.io/c' })
+  ];
+  const seq = sequence();
+  assert.equal(seq.pick(rules, 'https://x.io/b', 'GET'), null, 'no plain override for B, nothing ran yet');
+  seq.pick(rules, 'https://x.io/c', 'GET');
+  seq.pick(rules, 'https://x.io/a', 'GET');
+  assert.equal(seq.pick(rules, 'https://x.io/b', 'GET').id, 'b2');
+  seq.pick(rules, 'https://x.io/c', 'GET');
+  assert.equal(seq.pick(rules, 'https://x.io/b', 'GET').id, 'b3');
+});
+
+test('"after" ignores disabled overrides and a trigger that never ran', () => {
+  const rules = [
+    rule({ id: 'b1', pattern: 'https://x.io/b' }),
+    rule({ id: 'b2', pattern: 'https://x.io/b', after: 'gone' }),
+    rule({ id: 'b3', pattern: 'https://x.io/b', after: 'a', enabled: false }),
+    rule({ id: 'a', pattern: 'https://x.io/a' })
+  ];
+  const seq = sequence();
+  seq.pick(rules, 'https://x.io/a', 'GET');
+  assert.equal(seq.pick(rules, 'https://x.io/b', 'GET').id, 'b1');
+  assert.equal(findRule(rules, 'https://x.io/b', 'GET').id, 'b1', 'findRule prefers plain overrides');
+  assert.equal(findRule(rules.slice(1), 'https://x.io/b', 'GET').id, 'b2', '…and falls back to an "after" one');
 });

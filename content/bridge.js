@@ -7,6 +7,7 @@
   let active = [];
   let loaded = false;
   let native = false; // the network layer (debugger) applies overrides for this frame instead of the page patch
+  const seq = APIOV_MATCH.sequence();
 
   const emit = (type, data) => document.dispatchEvent(new CustomEvent(type, { detail: JSON.stringify(data) }));
 
@@ -55,7 +56,7 @@
       return;
     }
     if (!q || typeof q.url !== 'string') return;
-    const rule = enabled ? APIOV_MATCH.findRule(active, q.url, q.method) : null;
+    const rule = enabled ? seq.pick(active, q.url, q.method) : null;
     emit('apiov:match-result', { id: q.id, rule });
   });
 
