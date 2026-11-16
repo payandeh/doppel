@@ -68,12 +68,26 @@ test('groups are created from a path and overrides can wait for another', async 
   assert.equal(b2.groupId, groups.find((g) => g.name === 'Later').id);
 });
 
+test('a non-JSON body is stored when content_type says so', async () => {
+  const dir = folder();
+  const [res] = await session(dir, [
+    ['add_override', { name: 'Page', pattern: '/page', body: '<p>hi</p>', content_type: 'html', status: 200 }]
+  ]);
+  assert.equal(res.isError, undefined);
+  const added = read(dir).rules.find((r) => r.name === 'Page');
+  assert.equal(added.body, '<p>hi</p>');
+  assert.equal(added.contentType, 'text/html');
+  assert.equal(res.structuredContent.added.content_type, 'text/html');
+});
+
 test('bad input is reported to the agent and leaves the file alone', async () => {
   const dir = folder();
   const before = readFileSync(join(dir, 'doppel.json'), 'utf8');
   const res = await session(dir, [
     ['add_override', { pattern: '/x', status: 99 }],
     ['add_override', { pattern: '/x', body: '{not json' }],
+    ['add_override', { pattern: '/x', body: '<p>', content_type: 'not a type' }],
+    ['add_override', { pattern: '/x', body: { html: true }, content_type: 'text/html' }],
     ['add_override', { pattern: '/x' }],
     ['add_override', { pattern: '/x', mock_only: true, status: 200 }],
     ['update_override', { id: 'nope', status: 200 }]

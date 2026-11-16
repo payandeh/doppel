@@ -18,8 +18,10 @@ const MATCH_TYPES = ['equals', 'contains', 'wildcard', 'regex'];
 // Same ordering code the extension runs, so a new override lands exactly where the editor would put it.
 const ctx = vm.createContext({});
 ctx.globalThis = ctx;
-for (const f of ['lib/match.js', 'lib/tree.js']) vm.runInContext(readFileSync(join(here, '..', f), 'utf8'), ctx);
+for (const f of ['lib/content-type.js', 'lib/match.js', 'lib/tree.js'])
+  vm.runInContext(readFileSync(join(here, '..', f), 'utf8'), ctx);
 const T = ctx.APIOV_TREE;
+const Type = ctx.APIOV_TYPE;
 
 function filePath() {
   const arg = process.argv[2] || process.env.DOPPEL_FOLDER || process.env.DOPPEL_FILE;
@@ -124,17 +126,40 @@ function resolveGroup(st, ref) {
   return byId ? byId.id : ensureGroup(st, ref);
 }
 
-function bodyText(body) {
+function bodyText(body, contentType) {
   if (body === undefined) return undefined;
   if (body === null) return '';
-  if (typeof body !== 'string') return JSON.stringify(body, null, 2);
+  const json = Type.isJson(contentType);
+  if (typeof body !== 'string') {
+    if (!json)
+      throw new UserError(
+        'body must be a string when content_type is not JSON. Pass HTML, XML or other text as a string.'
+      );
+    return JSON.stringify(body, null, 2);
+  }
   if (body.trim() === '') return '';
+  if (!json) return body;
   try {
     JSON.parse(body);
   } catch (e) {
-    throw new UserError(`body is a string but not valid JSON (${e.message}). Pass the JSON value itself instead.`);
+    throw new UserError(
+      `body is a string but not valid JSON (${e.message}). Pass the JSON value itself, or set content_type (for example text/html).`
+    );
   }
   return body;
+}
+
+function applyContentType(rule, value) {
+  if (value === null || String(value).trim() === '') {
+    delete rule.contentType;
+    return;
+  }
+  const parsed = Type.parse(value);
+  if (!parsed || !parsed.ok)
+    throw new UserError('content_type must be a media type like text/html, application/json or text/plain.');
+  const stored = Type.stored(value);
+  if (stored) rule.contentType = stored;
+  else delete rule.contentType;
 }
 
 function applyFields(st, rule, a) {
@@ -165,7 +190,8 @@ function applyFields(st, rule, a) {
       throw new UserError('status must be a whole number from 200 to 599, or null to keep the real status.');
     rule.status = a.status;
   }
-  const body = bodyText(a.body);
+  if (a.content_type !== undefined) applyContentType(rule, a.content_type);
+  const body = bodyText(a.body, rule.contentType);
   if (body !== undefined) rule.body = body;
   if (a.delay_ms !== undefined) rule.delay = Math.max(0, parseInt(a.delay_ms, 10) || 0);
   if (a.mock_only !== undefined) rule.mockOnly = !!a.mock_only;
@@ -196,6 +222,7 @@ function summary(st, r) {
     ...(r.ignoreQuery ? { ignore_query: true } : {}),
     status: Number.isInteger(r.status) ? r.status : null,
     has_body: typeof r.body === 'string' && r.body.trim() !== '',
+    ...(r.contentType ? { content_type: r.contentType } : {}),
     ...(r.delay ? { delay_ms: r.delay } : {}),
     ...(r.mockOnly ? { mock_only: true } : {}),
     ...(r.after ? { after: after ? { id: after.id, name: after.name || '' } : { id: r.after, missing: true } } : {}),
@@ -234,7 +261,12 @@ const RULE_FIELDS = {
   },
   body: {
     description:
-      'Response body: any JSON value (object, array, string, number…). Pass the value itself, not a JSON-encoded string. null or "" keeps the real body.'
+      'Response body. For JSON (the default content type), pass any JSON value — object, array, string, number — not a JSON-encoded string. For any other content_type, pass the raw text as a string. null or "" keeps the real body.'
+  },
+  content_type: {
+    type: 'string',
+    description:
+      'Content-Type of the overridden body. application/json is the default and is omitted when stored. Any media type is accepted, for example text/html, text/plain, text/xml, application/xml, text/css, application/javascript, text/csv, image/svg+xml. Short names such as html, xml, text and json work too. Only sent when the body is overridden.'
   },
   delay_ms: { type: 'integer', minimum: 0, description: 'Extra delay before the response, in milliseconds.' },
   mock_only: {
@@ -315,9 +347,11 @@ const TOOLS = [
       const st = load();
       const r = findOne(st.rules, a.id, 'override');
       let body = r.body || '';
-      try {
-        body = body.trim() ? JSON.parse(body) : null;
-      } catch (_) {}
+      if (Type.isJson(r.contentType)) {
+        try {
+          body = body.trim() ? JSON.parse(body) : null;
+        } catch (_) {}
+      }
       return { ...summary(st, r), body };
     }
   },
@@ -473,10 +507,11 @@ const TOOLS = [
   }
 ];
 
-const INSTRUCTIONS = `Doppel is a Chrome extension that overrides the status code and JSON body of a web page's API responses.
+const INSTRUCTIONS = `Doppel is a Chrome extension that overrides the status code and body of a web page's API responses.
 These tools edit the doppel.json file that Doppel syncs with. Changes reach the browser on the next page load, so
 tell the user to reload the page after adding or changing an override. When the user describes a mock in words,
-build the JSON body yourself and pass it as a value. Prefer match_type "contains" with a distinctive path.
+build the body yourself. JSON is the default: pass it as a value and leave content_type unset. For HTML, XML, plain
+text or any other media type, pass body as a string and set content_type (for example "text/html"). Prefer match_type "contains" with a distinctive path.
 Overrides are checked top to bottom and the first enabled match wins; add_override puts new ones at the top.`;
 
 const PROTOCOLS = ['2025-06-18', '2025-03-26', '2024-11-05'];

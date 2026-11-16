@@ -2,7 +2,7 @@
   "name": "doppel",
   "version": "1.8.1",
   "private": true,
-  "description": "A body double for your API responses — Chrome extension to override REST API status codes and JSON bodies.",
+  "description": "A body double for your API responses — Chrome extension to override REST API status codes and response bodies.",
   "license": "MIT",
   "author": "Omid (https://github.com/payandeh)",
   "repository": {

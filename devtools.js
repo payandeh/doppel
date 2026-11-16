@@ -73,6 +73,7 @@ async function openEditorFor(url) {
     draft.found = true;
     draft.method = req.request.method.toUpperCase();
     draft.status = req.response.status || null;
+    draft.mime = (req.response.content && req.response.content.mimeType) || '';
     draft.body = await getContent(req);
   }
   await chrome.storage.local.set({ apiov_draft: draft });

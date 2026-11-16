@@ -90,7 +90,11 @@
       _doppel: true,
       _resourceType: rec.kind || 'fetch',
       request: { url: rec.url, method: rec.method },
-      response: { status: rec.status, content: { mimeType: 'application/json', size: body.length }, _transferSize: 0 },
+      response: {
+        status: rec.status,
+        content: { mimeType: (rec.contentType || 'application/json').split(';')[0].trim(), size: body.length },
+        _transferSize: 0
+      },
       time: 0,
       getContent: (cb) => cb(body, '')
     };
@@ -222,7 +226,8 @@
     const canToggle = !!ap && ap.via === 'page' && ap.body !== undefined && !ap.mocked;
     $('pv-toggle').hidden = !canToggle;
     $('pv-toggle').textContent = item.showReal ? 'Show override' : 'Show real response';
-    $('pv-note').textContent = note || (content && !pretty ? 'Not JSON' : '');
+    const mime = (req.response?.content?.mimeType || ap?.contentType || '').split(';')[0].trim();
+    $('pv-note').textContent = note || (content && !pretty ? (mime && !/json/i.test(mime) ? mime : 'Not JSON') : '');
     const text = pretty ?? content;
     if (!text) return showPreviewMessage('(no response body)');
     showPreviewText(text.length > 2000000 ? text.slice(0, 2000000) + '\n… (truncated)' : text);
@@ -294,7 +299,9 @@
     const existing = ruleFor(req, true);
     if (existing) return openRuleEditor({ rule: existing, originalStatus: req.response.status || null });
     const content = await getContent(req);
-    const body = APIOV.prettyJson(content) ?? content;
+    const mime = req.response?.content?.mimeType || '';
+    const contentType = APIOV_TYPE.stored(mime);
+    const body = APIOV_TYPE.isJson(mime) ? (APIOV.prettyJson(content) ?? content) : content;
     openRuleEditor({
       isNew: true,
       originalStatus: req.response.status || null,
@@ -303,7 +310,8 @@
         matchType: 'equals',
         pattern: req.request.url,
         status: null,
-        body: body || ''
+        body: body || '',
+        ...(contentType ? { contentType } : {})
       })
     });
   }

@@ -13,6 +13,9 @@ before(async () => {
     rule({ pattern: '/api/both', status: 404, body: '{"error":"nope"}' }),
     rule({ pattern: '/api/mock-only', method: 'POST', status: 201, body: '{"created":1}', mockOnly: true }),
     rule({ pattern: '/api/slow', body: '{"slow":1}', delay: 400 }),
+    rule({ pattern: '/api/html', body: '<p>hi</p>', contentType: 'text/html' }),
+    rule({ pattern: '/api/text', body: 'hello', contentType: 'text/plain' }),
+    rule({ pattern: '/api/xml', body: '<ok/>', contentType: 'application/xml' }),
     rule({ pattern: 'secret-other-site.example', body: '{"token":"SECRET"}' }),
     rule({ pattern: '/api/disabled', status: 500, enabled: false })
   ]);
@@ -69,6 +72,21 @@ test('fetch: body only keeps the real status', async () => {
     return [x.status, await x.json(), x.headers.get('content-type')];
   });
   assert.deepEqual(r, [200, { mock: true }, 'application/json; charset=utf-8']);
+});
+
+test('fetch: HTML, plain text and XML are sent with their content type', async () => {
+  const r = await page.evaluate(async () => {
+    const read = async (path) => {
+      const x = await fetch(path);
+      return [x.status, await x.text(), x.headers.get('content-type')];
+    };
+    return [await read('/api/html'), await read('/api/text'), await read('/api/xml')];
+  });
+  assert.deepEqual(r, [
+    [200, '<p>hi</p>', 'text/html; charset=utf-8'],
+    [200, 'hello', 'text/plain; charset=utf-8'],
+    [200, '<ok/>', 'application/xml; charset=utf-8']
+  ]);
 });
 
 test('fetch: status and body', async () => {

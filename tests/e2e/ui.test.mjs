@@ -63,3 +63,22 @@ test('toggle and duplicate from the card', async () => {
   assert.equal(after.length, 2);
   assert.ok(after.some((r) => r.name === 'Renamed copy'));
 });
+
+test('editor accepts HTML and any other content type', async () => {
+  await page.click('[data-act=new]');
+  await page.fill('[name=pattern]', 'https://example.com/page');
+  assert.equal(await page.inputValue('[name=contentType]'), 'application/json');
+  await page.selectOption('[name=contentType]', 'text/html');
+  await page.click('.cm-content');
+  await page.keyboard.press('ControlOrMeta+a');
+  await page.keyboard.type('<p>hello</p>');
+  await sleep(300);
+  assert.match(await page.textContent('.json-state'), /text\/html/);
+  assert.equal(await page.isVisible('[data-act=format]'), false);
+  await page.click('[data-act=save]');
+  await sleep(300);
+  const saved = (await rules()).find((r) => r.pattern === 'https://example.com/page');
+  assert.equal(saved.contentType, 'text/html');
+  assert.equal(saved.body, '<p>hello</p>');
+  assert.equal(await page.isVisible('.modal-back'), false);
+});

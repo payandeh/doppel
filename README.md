@@ -5,7 +5,7 @@
 <h1 align="center">Doppel</h1>
 
 <p align="center"><b>A body double for your API responses.</b><br>
-Override the status code and JSON body of any REST call, straight from Chrome's Network tab. Keep as many overrides on at once as you like.</p>
+Override the status code and body of any REST call, straight from Chrome's Network tab. Keep as many overrides on at once as you like.</p>
 
 <p align="center">
   <a href="https://github.com/payandeh/doppel/actions/workflows/ci.yml"><img src="https://github.com/payandeh/doppel/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
@@ -31,7 +31,7 @@ Doppel lets you:
 - **Run many overrides at once**, each with its own on/off switch, plus one switch to turn everything off.
 - **Organize them in groups**, nested as deep as you like. Collapse a group, switch a whole group off, or export just the groups you need.
 - **Start from the real response.** Right-click a request in the Network tab → **Open using Doppel**, and the current response is copied into the editor.
-- **Edit JSON properly** with syntax highlighting, folding, search, Beautify/Minify and a strict validator that points to the exact line and column of an error.
+- **Edit the body.** JSON gets syntax highlighting, folding, search, Beautify/Minify and a validator that points at the exact error. HTML, XML, plain text and any other content type are accepted as written.
 - **Save your mocks to a folder** (`doppel.json`), so they survive reinstalling the extension, work on other computers and can live in Git with your team.
 
 ## Install
@@ -47,7 +47,7 @@ Doppel isn't on the Chrome Web Store yet.
 
 1. Open DevTools → **Network**.
 2. Right-click a request → **Open using Doppel**.
-3. Change the status and/or the JSON body, then **Save**.
+3. Change the status, the content type and/or the body, then **Save**.
 
 <p align="center"><img src="docs/editor-dark.png" width="720" alt="Doppel editor"></p>
 
@@ -57,15 +57,16 @@ Manage everything from the toolbar popup or the manager page (right-click the to
 
 ### Override options
 
-| Option         | What it does                                                                                     |
-| -------------- | ------------------------------------------------------------------------------------------------ |
-| Method         | `ANY`, or a specific HTTP method                                                                 |
-| URL match      | **Equals** (optionally ignoring the query string), **Contains**, **Wildcard** (`*`) or **Regex** |
-| Status code    | 200–599. Empty = keep the server's status                                                        |
-| Response body  | JSON. Empty = keep the server's body                                                             |
-| Delay          | Wait before responding (ms)                                                                      |
-| Mock only      | Don't call the server at all                                                                     |
-| Use only after | Wait until another override has answered a request on the page, then take priority               |
+| Option         | What it does                                                                                                    |
+| -------------- | --------------------------------------------------------------------------------------------------------------- |
+| Method         | `ANY`, or a specific HTTP method                                                                                |
+| URL match      | **Equals** (optionally ignoring the query string), **Contains**, **Wildcard** (`*`) or **Regex**                |
+| Status code    | 200–599. Empty = keep the server's status                                                                       |
+| Response body  | Any text. JSON is checked; every other type is sent as written. Empty = keep the server's body                  |
+| Content type   | Media type of a custom body. `application/json` by default; `text/html`, `text/plain` and the rest are accepted |
+| Delay          | Wait before responding (ms)                                                                                     |
+| Mock only      | Don't call the server at all                                                                                    |
+| Use only after | Wait until another override has answered a request on the page, then take priority                              |
 
 When several overrides match the same request, the one higher in the list wins.
 
