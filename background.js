@@ -1,4 +1,4 @@
-importScripts('lib/match.js', 'lib/folder-sync.js', 'lib/native.js');
+importScripts('lib/match.js', 'lib/cors.js', 'lib/folder-sync.js', 'lib/native.js');
 
 Native.init();
 
