@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
 export function loadScript(relPaths, exportName) {
-  const ctx = vm.createContext({ globalThis: {}, console });
+  const ctx = vm.createContext({ globalThis: {}, console, URL });
   ctx.globalThis = ctx;
   for (const relPath of [].concat(relPaths))
     vm.runInContext(readFileSync(new URL('../../' + relPath, import.meta.url), 'utf8'), ctx);

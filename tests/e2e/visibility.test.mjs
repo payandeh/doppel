@@ -12,9 +12,32 @@ const RULES = [
   rule({ pattern: '/api/mock-only', body: '{"mocked":1}', mockOnly: true })
 ];
 
-let api;
-before(async () => (api = await server()));
+let api, dead;
+before(async () => {
+  api = await server();
+  // A cross-origin base where nothing listens: mock-only must not need a server, or CORS headers from one.
+  const gone = await server();
+  dead = gone.base.replace('localhost', '127.0.0.1');
+  await new Promise((r) => gone.srv.close(r));
+});
 after(() => api.srv.close());
+
+// Mock-only calls to another origin: plain fetch, credentialed fetch, and credentialed XHR.
+const crossOrigin = (page, base) =>
+  page.evaluate(async (url) => {
+    const read = async (x) => ({ status: x.status, body: await x.text(), doppel: x.headers.get('x-doppel') });
+    const out = { fetch: await read(await fetch(url)) };
+    out.credentials = await read(await fetch(url + '?c=1', { credentials: 'include' }));
+    out.xhr = await new Promise((res) => {
+      const x = new XMLHttpRequest();
+      x.open('GET', url + '?x=1');
+      x.withCredentials = true;
+      x.onload = () => res({ status: x.status, body: x.responseText, doppel: x.getResponseHeader('x-doppel') });
+      x.onerror = () => res({ error: true });
+      x.send();
+    });
+    return out;
+  }, base + '/api/mock-only');
 
 // Network-domain view of a request, the same way the DevTools front-end reads it.
 async function networkView(ctx, page, run) {
@@ -77,6 +100,11 @@ describe('default (page-level) mode', () => {
     // Real body is drained, not cancelled, so DevTools can show it.
     assert.match(net['/api/body'].body, /"real":true/);
     assert.equal(net['/api/mock-only'], undefined);
+  });
+
+  test('mock only works cross-origin without a server (no network, so no CORS check)', async () => {
+    const got = await crossOrigin(page, dead);
+    for (const k of ['fetch', 'credentials', 'xhr']) assert.equal(got[k].body, '{"mocked":1}', k);
   });
 
   test("reports what the page received to Doppel's DevTools tab", async () => {
@@ -167,6 +195,15 @@ describe("network-level mode (Chrome's Network tab)", () => {
         })
     );
     assert.deepEqual(r, { status: 418, body: '{"mock":true}' });
+  });
+
+  test('mock only works cross-origin without a server: the made-up response passes the CORS check', async () => {
+    const got = await crossOrigin(page, dead);
+    const want = { status: 200, body: '{"mocked":1}', doppel: 'mocked: status 200, body' };
+    assert.deepEqual(got.fetch, want);
+    assert.deepEqual(got.credentials, want, 'credentials: include needs the exact origin, not "*"');
+    assert.deepEqual(got.xhr, want);
+    assert.equal(await attached(), true, 'answered at the network layer, not by the page patch');
   });
 
   test("reports to Doppel's DevTools tab over the port", async () => {
